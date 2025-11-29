@@ -34,7 +34,6 @@ logs/
 
 # Model/artifact directories (adjust if you want to track any)
 saved_models/
-models/
 wandb/
 *.pt
 *.pth
