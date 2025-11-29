@@ -1,0 +1,60 @@
+# Root-level ignore for Python, C/C++ build, notebooks, data and IDEs
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Virtualenvs
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+
+# Python packaging / build
+build/
+dist/
+*.egg-info/
+*.whl
+
+# Common local files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Model/artifact directories (adjust if you want to track any)
+saved_models/
+models/
+wandb/
+*.pt
+*.pth
+*.h5
+*.ckpt
+*.npz
+
+# Large data folders (adjust if some are meant to be checked in)
+mhd_files/
+niigz_files/
+
+# C/C++ build artifacts
+*.o
+*.so
+*.a
+CMakeFiles/
+CMakeCache.txt
+Makefile
+bin/
+*.pdf
+*.nii.gz
+*.mhd
+*.raw
