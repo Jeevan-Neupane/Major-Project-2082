@@ -148,5 +148,5 @@ The inference pipeline reconstructs 3D models from multi-view X-ray images:
 
 - **Jeevan Neupane** - AI Development
 - **Anil Shrestha** - AI and Frontend Development
-- **Nabin Ranabhat** - AI and Frontend Development
+- **Kshitiz Paudel** - AI and Frontend Development
 
