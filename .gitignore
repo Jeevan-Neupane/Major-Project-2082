@@ -1,0 +1,45 @@
+# Large data files
+*.nii
+*.nii.gz
+*.mhd
+*.raw
+*.mha
+*.dcm
+*.nrrd
+*.vtk
+*.h5
+*.hdf5
+*.pkl
+*.pt
+*.pth
+*.onnx
+*.bin
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# Dataset directories
+Data Preparation/DRR Generation/mhd_files/
+Data Preparation/DRR Generation/niigz_files/
+
+# Build artifacts
+build/
+out/
+*.o
+*.a
+*.so
+*.dll
+*.exe
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.egg-info/
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
