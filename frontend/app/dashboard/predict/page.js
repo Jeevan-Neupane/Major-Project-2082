@@ -37,13 +37,12 @@ function Stat({ label, value }) {
     return (
         <div>
             <p className="text-xs text-gray-500">{label}</p>
-            <p className="text-gray-200 font-medium text-sm truncate">{value || "â€”"}</p>
+            <p className="text-gray-200 font-medium text-sm truncate">{value || ""}</p>
         </div>
     );
 }
 
 export default function PredictPage() {
-    // :€:€ Step 1: Patient :€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€
     const [patientMode, setPatientMode] = useState("new");       // "new" | "existing"
     const [patientSearch, setPatientSearch] = useState("");
     const [patientResults, setPatientResults] = useState([]);
@@ -57,7 +56,6 @@ export default function PredictPage() {
     const [savedPatient, setSavedPatient] = useState(null);      // confirmed/saved patient :’ unlocks step 2
     const [patientError, setPatientError] = useState("");
 
-    // :€:€ Step 2: Imaging :€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€
     const [models, setModels] = useState([]);
     const [selectedModel, setSelectedModel] = useState("");
     const [apFile, setApFile] = useState(null);
@@ -67,7 +65,6 @@ export default function PredictPage() {
     const [threshold, setThreshold] = useState(0.5);
     const [smooth, setSmooth] = useState(1.0);
 
-    // :€:€ Result :€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€
     const [loading, setLoading] = useState(false);
     const [progress, setProgress] = useState("");
     const [meshData, setMeshData] = useState(null);
@@ -113,7 +110,6 @@ export default function PredictPage() {
         }
     }, []);
 
-    // :€:€ Step 1: Save / Confirm patient :€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€
     async function handleSavePatient(e) {
         e.preventDefault();
         setPatientError("");
@@ -194,7 +190,7 @@ export default function PredictPage() {
         form.append("patient_id", savedPatient._id);
 
         try {
-            setProgress("Running AI model â€” reconstructing 3D bone...");
+            setProgress("Running AI model  reconstructing 3D bone...");
             const res = await fetch("/api/predict", { method: "POST", body: form });
 
             if (!res.ok) {
@@ -264,7 +260,7 @@ export default function PredictPage() {
                                 </div>
                                 <div className="min-w-0">
                                     <p className="font-semibold text-green-200 text-sm truncate">{savedPatient.name}</p>
-                                    <p className="text-green-600 text-xs">{savedPatient.patientId} &middot; {savedPatient.age ? `${savedPatient.age}y` : "â€”"} &middot; {savedPatient.gender || "â€”"}</p>
+                                    <p className="text-green-600 text-xs">{savedPatient.patientId} &middot; {savedPatient.age ? `${savedPatient.age}y` : ""} &middot; {savedPatient.gender || ""}</p>
                                 </div>
                                 <svg className="w-5 h-5 text-green-500 flex-shrink-0 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -322,7 +318,7 @@ export default function PredictPage() {
                                             <label className="block text-xs font-medium text-gray-400 mb-1">Gender</label>
                                             <select value={patientGender} onChange={(e) => setPatientGender(e.target.value)}
                                                 className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-gray-800 text-gray-100 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none">
-                                                <option value="">â€”</option>
+                                                <option value=""></option>
                                                 <option value="Male">Male</option>
                                                 <option value="Female">Female</option>
                                                 <option value="Other">Other</option>
@@ -355,16 +351,15 @@ export default function PredictPage() {
                                             Saving...
                                         </>
                                     ) : patientMode === "existing" ? (
-                                        "Confirm Patient :’"
+                                        "Confirm Patient"
                                     ) : (
-                                        "Save Patient & Continue :’"
+                                        "Save Patient & Continue"
                                     )}
                                 </button>
                             </form>
                         )}
                     </div>
 
-                    {/* :€:€ STEP 2: X-Ray Upload :€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€:€ */}
                     <form onSubmit={handlePredict}
                         className={`bg-gray-900 rounded-xl border p-5 space-y-4 transition-all ${step1Done ? "border-gray-800" : "border-gray-800/50 opacity-50 pointer-events-none select-none"}`}
                     >
@@ -378,9 +373,9 @@ export default function PredictPage() {
                             <label className="block text-xs font-medium text-gray-400 mb-1">AI Model</label>
                             <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)}
                                 className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-gray-800 text-gray-100 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none">
-                                {models.length === 0 && <option value="">No models available â€” is the AI backend running?</option>}
+                                {models.length === 0 && <option value="">No models available is the AI backend running?</option>}
                                 {models.map((m) => (
-                                    <option key={m.model_key} value={m.model_key}>{m.model_key} â€” {m.description}</option>
+                                    <option key={m.model_key} value={m.model_key}>{m.model_key} {m.description}</option>
                                 ))}
                             </select>
                             {anatomy && <p className="mt-1 text-xs text-gray-500">Anatomy: {ANATOMY_MAP[anatomy]}</p>}
@@ -441,7 +436,6 @@ export default function PredictPage() {
                     </form>
                 </div>
 
-                {/* :€:€ Right Column: 3D Viewer + Result Info :€:€:€:€:€:€:€:€:€:€:€ */}
                 <div className="lg:col-span-3 space-y-4">
                     <BoneViewer meshData={meshData} />
 
