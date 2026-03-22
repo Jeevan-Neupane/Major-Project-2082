@@ -1,0 +1,18 @@
+[
+  {
+    "id": "admin-001",
+    "username": "admin",
+    "name": "Administrator",
+    "role": "admin",
+    "passwordHash": "$2a$10$qVPwOP1DqEjeHjS//BcYQOygzOGDzuYv5irzkC4XQPmD8eOxkAz/C",
+    "createdAt": "2026-03-06T02:21:42.846Z"
+  },
+  {
+    "id": "usr-mme9qyy3",
+    "username": "prakash",
+    "name": "Dr Prakash Kandel",
+    "role": "doctor",
+    "passwordHash": "$2a$10$p2bSMfZzQZPjceMacF/NS.igm9aIzzwN.C0KYitjKaunPOPZVwgWW",
+    "createdAt": "2026-03-06T02:22:02.995Z"
+  }
+]
