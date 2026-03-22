@@ -1,20 +1,27 @@
 """
-Top-level entry point for the inference API server.
-Run from any location:
+Inference API Server - Entry Point
 
+Run the server from any location:
+
+    # Default
     python serve.py
+
+    # Custom host and port
     python serve.py --host 0.0.0.0 --port 9000
+
+    # Preload specific models
     python serve.py --preload transvert_femur swinx2s_hip
 """
+
 import sys
 import os
 
-# Always resolve the project root and put it first on the path
+# Ensure project root is first in sys.path
 _PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
-# Delegate to the inference module's run_server main()
+# Start the inference server
 from inference.run_server import main
 
 if __name__ == "__main__":
