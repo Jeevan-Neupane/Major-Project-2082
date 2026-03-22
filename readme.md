@@ -1,78 +1,247 @@
-# Major Project 2082
+# X-Ray to 3D Bone Reconstruction
 
-Welcome to the **Major Project 2082** repository. This project focuses on advanced 3D medical imaging techniques, simulation of X-ray projections, and medical data preparation.
-
-## 📌 Project Overview
-
-The core objective of this project is to bridge the gap between 3D volumetric data (like CT scans) and 2D radiographic imaging. By digitally reconstructing radiographs (DRRs) and exploring X-ray projections, this project aims to support tasks such as medical image alignment, synthetic data generation, and potentially 3D anatomy reconstruction from 2D views.
-
-
-
-## 📂 Repository Structure
-
-The project is currently divided into specialized data preparation and visualization modules.
-
-### [Data Preparation](./Data%20Preparation)
-
-This directory contains all the workflows and codebases for processing medical data.
-
-- **[DRR Generation](./Data%20Preparation/DRR%20Generation/readme.md)**  
-  A high-performance C++ based pipeline that generates synthetic X-ray images (Digitally Reconstructed Radiographs) from 3D CT scans. It simulates the physics of X-ray projection and supports both `.mhd` and `.nii.gz` formats. Check out its [dedicated README](./Data%20Preparation/DRR%20Generation/readme.md) for build and run instructions.
-  
-- **[Notebooks](./Data%20Preparation/notebooks)**  
-  A collection of Python scripts and Jupyter Notebooks for prototyping and data conversion:
-  - `DRR Generation.ipynb`: Prototyping and visualizations for the DRR generation algorithm.
-  - `NIIGZ To MHD.ipynb`: Conversion utilities to transform NIfTI compressed files (`.nii.gz`) into MetaImage headers and raw binary data (`.mhd` + `.raw`).
-  - `X_ray_to_3d_projection.ipynb`: 3D visual plotting of the X-ray source, detector geometry, and the CT volume using Matplotlib.
-
-## Datasets
-
-- **CT Scans**: 3D medical imaging data used as input for DRR generation. Datasets should be placed in the appropriate data directory as described in the module documentation.
-- **DRR Images**: Synthetic X-ray images generated from CT scans. Output location and format are configurable in the DRR Generation module.
+Deep learning pipeline for reconstructing 3D bone volumes from 2D X-ray images.  
+Two orthogonal views (AP + Lateral) are fused to predict a full 3D binary segmentation mask.
 
 ## Models
 
-- **DRR Generation Model**: The C++ implementation in `Data Preparation/DRR Generation/` simulates X-ray projections from CT volumes using ray marching and camera models. See the [DRR Generation readme](Data%20Preparation/DRR%20Generation/readme.md) for technical details.
-- **Notebooks**: Jupyter notebooks in `Data Preparation/notebooks/` may include or reference machine learning models for further analysis or visualization. Refer to each notebook for model-specific information.
+| Model         | Type                                               | Parameters | Strengths         |
+| ------------- | -------------------------------------------------- | ---------- | ----------------- |
+| **SwinX2S**   | Swin Transformer + Cross-Attention + UNETR Decoder | 32M–558M   | Highest accuracy  |
+| **TransVert** | CNN Encoder + Volumetric Expansion + CNN Decoder   | ~0.5M      | Lightweight, fast |
 
-## 🛠️ Technologies Used
+## Datasets
 
-- **C/C++ & CMake**: For computationally intensive ray-marching and DRR generation.
-- **Python**: For data manipulation, prototyping, and 3D visualization.
-- **Jupyter Notebook**: For interactive development and data analysis.
-- **Medical Formats Supported**: NIfTI (`.nii`, `.nii.gz`) and MetaImage (`.mhd`, `.raw`).
+| Dataset      | Source           | Volumes | Volume Size | X-ray Size |
+| ------------ | ---------------- | ------- | ----------- | ---------- |
+| **Femur**    | TotalSegmentator | 931     | 85³         | 128×128    |
+| **Hip**      | TotalSegmentator | ~800    | 191–192³    | 288×288    |
+| **Rib**      | TotalSegmentator | ~700    | 213³        | 320×320    |
+| **Verse19**  | VerSe Challenge  | 1168    | 96×96×31–48 | 96×96      |
+| **Verse20**  | VerSe Challenge  | 133     | 104–147³    | 96×96      |
+| **CTPelvic** | CTPelvic1K       | ~200    | 294–546³    | 288×288    |
 
-## 🚀 Getting Started
-### Prerequisites
-- **C++17** or later
-- **CMake** (for building C++ code)
-- **Python 3.x** (for notebooks and data conversion)
-- **Jupyter Notebook/Lab** (for running notebooks)
-- Recommended: Python packages such as `numpy`, `matplotlib`, and `SimpleITK` (see notebook cells for details)
+## Quick Start
 
-### Building the DRR Generation Module
-1. Open a terminal and navigate to the DRR Generation directory:
-   ```sh
-   cd Data Preparation/DRR Generation
-   ```
-2. Create a build directory and run CMake:
-   ```sh
-   mkdir build
-   cd build
-   cmake ..
-   make
-   ```
-3. The resulting executable will be available in the `build` directory.
+```bash
+# 1. Install dependencies
+pip install -r requirements.txt
 
-### Running the Notebooks
-1. Navigate to the notebooks directory:
-   ```sh
-   cd Data Preparation/notebooks
-   ```
-2. Launch Jupyter Lab or Notebook:
-   ```sh
-   jupyter lab
-   # or
-   jupyter notebook
-   ```
-3. Open and run the desired notebook (e.g., `DRR Generation.ipynb`).
+# 2. List available configs
+python train.py --list_configs
+
+# 3. Train (example)
+python train.py --config swinx2s_femur --model_size small --epochs 150
+```
+
+## Project Structure
+
+```
+├── train.py                 # Main training entry point
+├── test_hip_metrics.py      # Hip clinical metrics testing
+├── requirements.txt         # Python dependencies
+├── configs/
+│   ├── config.py            # All dataset/model configurations
+│   └── args_parser.py       # CLI argument parsing
+├── models/
+│   ├── swinx2s.py           # SwinX2S model
+│   ├── transvert.py         # TransVert model (self-contained)
+│   └── swinX2S/             # Swin Transformer components
+│       ├── swin_transformer.py
+│       ├── transfusion.py
+│       └── unetr_blocks.py
+├── utils/
+│   ├── data/                # Data loading
+│   │   └── dataset.py       # BoneDataset & collate_bone
+│   ├── training/            # Training infrastructure
+│   │   ├── trainer.py       # Train/validate epoch loops
+│   │   ├── losses.py        # DiceBCE loss
+│   │   ├── metrics.py       # Dice score computation
+│   │   ├── checkpoint.py    # Model checkpoint management
+│   │   └── logger.py        # Training logger (file + CSV)
+│   └── clinical/            # Clinical metric evaluation
+│       ├── femur_metrics.py  # Diameter, NSA, length
+│       ├── hip_metrics.py    # Pelvic width, acetabular diameter/depth
+│       └── verse_metrics.py  # Height, width, depth
+├── logs/                    # Training logs (.log + .csv + _clinical.csv)
+├── saved_models/            # Best checkpoints per config
+└── datasets/datasets/       # Data root
+    ├── Total Segmentator/   (Femur/, Hip/, Rib/)
+    ├── Verse/               (verse19/, verse20/)
+    └── ctpelvik/
+```
+
+---
+
+## Training Commands — All Datasets
+
+> **Flags:** `--no_wandb` disables W&B logging. `--model_size` applies only to SwinX2S.  
+> Logs are saved automatically to `logs/<config>_<timestamp>.log` and `.csv`.
+
+### Femur
+
+| Model     | Size      | Command                                                                                 | Batch | GPU Mem |
+| --------- | --------- | --------------------------------------------------------------------------------------- | ----- | ------- |
+| SwinX2S   | Tiny      | `python train.py --config swinx2s_femur --model_size tiny --epochs 100 --batch_size 4`  | 4     | ~8 GB   |
+| SwinX2S   | **Small** | `python train.py --config swinx2s_femur --model_size small --epochs 150 --batch_size 4` | 4     | ~16 GB  |
+| SwinX2S   | Base      | `python train.py --config swinx2s_femur --model_size base --epochs 200 --batch_size 2`  | 2     | ~24 GB  |
+| TransVert | —         | `python train.py --config transvert_femur --epochs 150 --batch_size 4`                  | 4     | ~6 GB   |
+
+### Hip
+
+| Model     | Size      | Command                                                                               | Batch | GPU Mem |
+| --------- | --------- | ------------------------------------------------------------------------------------- | ----- | ------- |
+| SwinX2S   | Tiny      | `python train.py --config swinx2s_hip --model_size tiny --epochs 100 --batch_size 2`  | 2     | ~12 GB  |
+| SwinX2S   | **Small** | `python train.py --config swinx2s_hip --model_size small --epochs 150 --batch_size 2` | 2     | ~24 GB  |
+| SwinX2S   | Base      | `python train.py --config swinx2s_hip --model_size base --epochs 200 --batch_size 1`  | 1     | ~40 GB  |
+| TransVert | —         | `python train.py --config transvert_hip --epochs 150 --batch_size 2`                  | 2     | ~10 GB  |
+
+### Rib
+
+| Model     | Size      | Command                                                                               | Batch | GPU Mem |
+| --------- | --------- | ------------------------------------------------------------------------------------- | ----- | ------- |
+| SwinX2S   | Tiny      | `python train.py --config swinx2s_rib --model_size tiny --epochs 100 --batch_size 2`  | 2     | ~14 GB  |
+| SwinX2S   | **Small** | `python train.py --config swinx2s_rib --model_size small --epochs 150 --batch_size 1` | 1     | ~24 GB  |
+| SwinX2S   | Base      | `python train.py --config swinx2s_rib --model_size base --epochs 200 --batch_size 1`  | 1     | ~40 GB  |
+| TransVert | —         | `python train.py --config transvert_rib --epochs 150 --batch_size 2`                  | 2     | ~10 GB  |
+
+### Verse19
+
+| Model     | Size      | Command                                                                                   | Batch | GPU Mem |
+| --------- | --------- | ----------------------------------------------------------------------------------------- | ----- | ------- |
+| SwinX2S   | Tiny      | `python train.py --config swinx2s_verse19 --model_size tiny --epochs 100 --batch_size 4`  | 4     | ~8 GB   |
+| SwinX2S   | **Small** | `python train.py --config swinx2s_verse19 --model_size small --epochs 150 --batch_size 2` | 2     | ~16 GB  |
+| SwinX2S   | Base      | `python train.py --config swinx2s_verse19 --model_size base --epochs 200 --batch_size 1`  | 1     | ~24 GB  |
+| TransVert | —         | `python train.py --config transvert_verse19 --epochs 150 --batch_size 4`                  | 4     | ~4 GB   |
+
+### Verse20
+
+| Model     | Size      | Command                                                                                   | Batch | GPU Mem |
+| --------- | --------- | ----------------------------------------------------------------------------------------- | ----- | ------- |
+| SwinX2S   | Tiny      | `python train.py --config swinx2s_verse20 --model_size tiny --epochs 100 --batch_size 4`  | 4     | ~8 GB   |
+| SwinX2S   | **Small** | `python train.py --config swinx2s_verse20 --model_size small --epochs 150 --batch_size 2` | 2     | ~16 GB  |
+| SwinX2S   | Base      | `python train.py --config swinx2s_verse20 --model_size base --epochs 200 --batch_size 1`  | 1     | ~24 GB  |
+| TransVert | —         | `python train.py --config transvert_verse20 --epochs 150 --batch_size 4`                  | 4     | ~4 GB   |
+
+### CTPelvic
+
+| Model     | Size      | Command                                                                                    | Batch | GPU Mem |
+| --------- | --------- | ------------------------------------------------------------------------------------------ | ----- | ------- |
+| SwinX2S   | Tiny      | `python train.py --config swinx2s_ctpelvic --model_size tiny --epochs 100 --batch_size 1`  | 1     | ~40 GB  |
+| SwinX2S   | **Small** | `python train.py --config swinx2s_ctpelvic --model_size small --epochs 150 --batch_size 1` | 1     | ~60 GB  |
+| SwinX2S   | Base      | `python train.py --config swinx2s_ctpelvic --model_size base --epochs 200 --batch_size 1`  | 1     | ~80 GB  |
+| TransVert | —         | `python train.py --config transvert_ctpelvic --epochs 150 --batch_size 1`                  | 1     | ~50 GB  |
+
+> **Note:** CTPelvic volumes (up to 546³) require A100 GPUs. All CTPelvic runs use batch_size=1.
+
+---
+
+## Optimal Recommended Commands
+
+If you only want to run **one command per dataset** (best accuracy/speed trade-off), use **SwinX2S Small**:
+
+```bash
+# Femur
+python train.py --config swinx2s_femur --model_size small --epochs 150 --batch_size 4
+
+# Hip
+python train.py --config swinx2s_hip --model_size small --epochs 150 --batch_size 2
+
+# Rib
+python train.py --config swinx2s_rib --model_size small --epochs 150 --batch_size 1
+
+# Verse19
+python train.py --config swinx2s_verse19 --model_size small --epochs 150 --batch_size 2
+
+# Verse20
+python train.py --config swinx2s_verse20 --model_size small --epochs 150 --batch_size 2
+
+# CTPelvic (requires A100 60GB+)
+python train.py --config swinx2s_ctpelvic --model_size small --epochs 150 --batch_size 1
+```
+
+---
+
+## Training Features
+
+- **Early Stopping** — halts if Dice score doesn't improve for 10 epochs
+- **Clinical Metrics** — per-dataset anatomical measurements tracked each epoch
+- **Best Model Selection** — saves checkpoint with highest validation Dice score
+- **Structured Logging** — every run produces a `.log` (human-readable) and `.csv` (machine-readable) in `logs/`
+- **W&B Integration** — optional experiment tracking (disable with `--no_wandb`)
+- **Mixed Precision** — automatic FP16 on CUDA for faster training and lower memory
+
+## Log Files
+
+Each training run creates up to three files in `logs/`:
+
+| File                                | Format | Content                                                         |
+| ----------------------------------- | ------ | --------------------------------------------------------------- |
+| `<config>_<timestamp>.log`          | Text   | Epoch-by-epoch metrics, config summary, per-sample examples     |
+| `<config>_<timestamp>.csv`          | CSV    | All numeric metrics per epoch for plotting/analysis             |
+| `<config>_<timestamp>_clinical.csv` | CSV    | Per-sample clinical measurements (pred / gt / error) each epoch |
+
+Example log output:
+
+```
+2026-03-04 07:15:23 | [Epoch 1/150] Train Loss: 0.4321 (BCE 0.2100 + Dice 0.2221) | Val Loss: 0.3987 (BCE 0.1900 + Dice 0.2087) | Val Dice: 0.7654 | LR: 1.00e-04 | Patience: 0/10 | Time: 45.2s
+2026-03-04 07:15:23 |   ** New best Dice: 0.7654 (epoch 1, loss 0.3987)
+2026-03-04 07:15:23 |   Clinical (femur): Diameter MAE: 3.21 | Nsa MAE: 4.56 | Length MAE: 6.78
+2026-03-04 07:15:23 |     Sample p_0001: diameter: pred=42.50 gt=44.10 err=1.60 | nsa: pred=128.30 gt=130.00 err=1.70
+```
+
+## Saved Models
+
+```
+saved_models/
+├── swinx2s/
+│   ├── small/
+│   │   ├── femur/
+│   │   │   ├── best_epoch045_dice0.9100_loss0.0432.pth
+│   │   │   └── best_model_weights.pth
+│   │   ├── hip/
+│   │   └── ...
+│   ├── tiny/
+│   └── base/
+└── transvert/
+    ├── femur/
+    ├── hip/
+    └── ...
+```
+
+## Clinical Metrics
+
+| Dataset           | Metric 1              | Metric 2                 | Metric 3              |
+| ----------------- | --------------------- | ------------------------ | --------------------- |
+| Femur             | Head Diameter (mm)    | Neck-Shaft Angle (°)     | Length (mm)           |
+| Hip / CTPelvic    | Pelvic Width (mm)     | Acetabular Diameter (mm) | Acetabular Depth (mm) |
+| Verse19 / Verse20 | Vertebral Height (mm) | Width (mm)               | Depth (mm)            |
+
+### Testing Hip Metrics
+
+```bash
+python test_hip_metrics.py "path/to/hip_mask.nii.gz"
+```
+
+## Troubleshooting
+
+**Out of Memory?** Reduce `--batch_size` or use a smaller `--model_size`.
+
+```bash
+# Try tiny model with batch 1
+python train.py --config swinx2s_hip --model_size tiny --epochs 100 --batch_size 1
+```
+
+**No GPU?** Training will automatically fall back to CPU (very slow for production use).
+
+**W&B errors?** Use `--no_wandb` to skip, or run `wandb login --relogin`.
+
+## Hardware Requirements
+
+| Model Size     | Min GPU Memory | Recommended GPU  |
+| -------------- | -------------- | ---------------- |
+| Tiny           | 8 GB           | RTX 3060+        |
+| Small          | 16–24 GB       | RTX 3090 / A5000 |
+| Base           | 24–40 GB       | A100 40GB        |
+| CTPelvic (any) | 40–80 GB       | A100 80GB        |
+| TransVert      | 4–10 GB        | Any modern GPU   |

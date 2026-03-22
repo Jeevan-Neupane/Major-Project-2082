@@ -1,0 +1,24 @@
+# Core Deep Learning (CPU version - will auto-detect GPU if available)
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Medical Imaging
+nibabel>=5.0.0
+monai>=1.2.0
+
+# Utilities
+tqdm>=4.65.0
+wandb>=0.15.0
+timm>=0.9.0
+
+# Visualization
+matplotlib>=3.7.0
+plotly>=5.14.0
+
+# Scientific Computing
+scipy>=1.10.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+
+# Image Processing
+Pillow>=9.5.0
