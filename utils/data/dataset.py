@@ -9,6 +9,7 @@ a folder structure of the form:
             ct-scan/ *.nii.gz
         ...
 """
+
 import os
 import glob
 import torch
@@ -40,11 +41,13 @@ class BoneDataset(Dataset):
         self.require_lat = require_lat
         self.duplicate_ap_if_missing_lat = duplicate_ap_if_missing_lat
 
-        self.transform_2d = transform_2d or T.Compose([
-            T.Grayscale(num_output_channels=1),
-            T.ToTensor(),
-            T.Resize(img_size_2d, antialias=True),
-        ])
+        self.transform_2d = transform_2d or T.Compose(
+            [
+                T.Grayscale(num_output_channels=1),
+                T.ToTensor(),
+                T.Resize(img_size_2d, antialias=True),
+            ]
+        )
 
         self.samples = []
 
@@ -71,12 +74,14 @@ class BoneDataset(Dataset):
                 if self.require_lat and not lat:
                     continue
 
-                self.samples.append({
-                    "pid": os.path.basename(pdir),
-                    "ap": ap[0],
-                    "lat": lat[0] if lat else None,
-                    "vol": vol[0],
-                })
+                self.samples.append(
+                    {
+                        "pid": os.path.basename(pdir),
+                        "ap": ap[0],
+                        "lat": lat[0] if lat else None,
+                        "vol": vol[0],
+                    }
+                )
 
         if len(self.samples) == 0:
             raise RuntimeError(f"No valid samples found under {root_dir}")
@@ -125,7 +130,9 @@ class BoneDataset(Dataset):
         if item["lat"] is not None:
             xb = self._load_xray(item["lat"])
         else:
-            xb = xa.clone() if self.duplicate_ap_if_missing_lat else torch.zeros_like(xa)
+            xb = (
+                xa.clone() if self.duplicate_ap_if_missing_lat else torch.zeros_like(xa)
+            )
 
         voxel_spacing = np.array([1.0, 1.0, 1.0], dtype=np.float32)
         if self.return_volume:
@@ -144,7 +151,7 @@ class BoneDataset(Dataset):
 
 
 def collate_bone(batch):
-    """Custom collate function that keeps voxel_spacing as a list of arrays."""
+    """Collates a batch of bone data, keeping voxel spacing as a list."""
     xa = torch.stack([b["xa"] for b in batch], dim=0)
     xb = torch.stack([b["xb"] for b in batch], dim=0)
     vol = None
