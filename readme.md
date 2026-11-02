@@ -28,47 +28,61 @@ Two orthogonal views (AP + Lateral) are fused to predict a full 3D binary segmen
 pip install -r requirements.txt
 
 # 2. List available configs
-python train.py --list_configs
+python -m src.train --list_configs
 
 # 3. Train (example)
-python train.py --config swinx2s_femur --model_size small --epochs 150
+python -m src.train --config swinx2s_femur --model_size small --epochs 150
 ```
 
 ## Project Structure
 
 ```
-├── train.py                 # Main training entry point
-├── test_hip_metrics.py      # Hip clinical metrics testing
-├── requirements.txt         # Python dependencies
-├── configs/
-│   ├── config.py            # All dataset/model configurations
-│   └── args_parser.py       # CLI argument parsing
-├── models/
-│   ├── swinx2s.py           # SwinX2S model
-│   ├── transvert.py         # TransVert model (self-contained)
-│   └── swinX2S/             # Swin Transformer components
-│       ├── swin_transformer.py
-│       ├── transfusion.py
-│       └── unetr_blocks.py
-├── utils/
-│   ├── data/                # Data loading
-│   │   └── dataset.py       # BoneDataset & collate_bone
-│   ├── training/            # Training infrastructure
-│   │   ├── trainer.py       # Train/validate epoch loops
-│   │   ├── losses.py        # DiceBCE loss
-│   │   ├── metrics.py       # Dice score computation
-│   │   ├── checkpoint.py    # Model checkpoint management
-│   │   └── logger.py        # Training logger (file + CSV)
-│   └── clinical/            # Clinical metric evaluation
-│       ├── femur_metrics.py  # Diameter, NSA, length
-│       ├── hip_metrics.py    # Pelvic width, acetabular diameter/depth
-│       └── verse_metrics.py  # Height, width, depth
+├── src/                     # All Python source code
+│   ├── __init__.py
+│   ├── train.py             # Main training entry point
+│   ├── serve.py             # Inference API server entry point
+│   ├── configs/
+│   │   ├── config.py        # All dataset/model configurations
+│   │   └── args_parser.py   # CLI argument parsing
+│   ├── datasets/
+│   │   └── bone_dataset.py  # BoneDataset & collate_bone
+│   ├── datasets/
+│   │   └── bone_dataset.py  # BoneDataset & collate_bone
+│   ├── models/
+│   │   ├── swinx2s/         # SwinX2S model + Swin Transformer components
+│   │   │   ├── x2s.py       # SwinX2S nn.Module
+│   │   │   ├── swin_transformer.py
+│   │   │   ├── transfusion.py
+│   │   │   └── unetr_blocks.py
+│   │   └── transvert.py     # TransVert model (self-contained)
+│   ├── utils/
+│   │   ├── training/        # Training infrastructure
+│   │   │   ├── trainer.py   # Train/validate epoch loops
+│   │   │   ├── losses.py    # DiceBCE loss
+│   │   │   ├── metrics.py   # Dice score computation
+│   │   │   ├── checkpoint.py # Model checkpoint management
+│   │   │   └── logger.py    # Training logger (file + CSV)
+│   │   └── __init__.py
+│   ├── clinical/            # Clinical metric evaluation
+│   │   ├── femur_metrics.py  # Diameter, NSA, length
+│   │   ├── hip_metrics.py    # Pelvic width, acetabular diameter/depth
+│   │   └── verse_metrics.py  # Height, width, depth
+│   └── inference/           # FastAPI inference server
+│       ├── api.py           # Endpoints, app factory
+│       ├── predictor.py     # Model loading & volume prediction
+│       ├── model_registry.py # Checkpoint → weights path mapping
+│       ├── schemas.py       # Pydantic request/response models
+│       └── run_server.py    # uvicorn launcher
+├── data_preparation/        # DRR generation (C++/CMake) + data notebooks
+│   ├── drr_generation/      # CUDA/C++ DRR renderer
+│   └── notebooks/           # Conversion & projection notebooks
+├── frontend/                # Next.js 14 web app
+├── docs/
+│   └── config-reference.md  # Configuration documentation
 ├── logs/                    # Training logs (.log + .csv + _clinical.csv)
 ├── saved_models/            # Best checkpoints per config
-└── datasets/datasets/       # Data root
-    ├── Total Segmentator/   (Femur/, Hip/, Rib/)
-    ├── Verse/               (verse19/, verse20/)
-    └── ctpelvik/
+├── requirements.txt         # Python dependencies
+└── readme.md
 ```
 
 ---
@@ -82,55 +96,55 @@ python train.py --config swinx2s_femur --model_size small --epochs 150
 
 | Model     | Size      | Command                                                                                 | Batch | GPU Mem |
 | --------- | --------- | --------------------------------------------------------------------------------------- | ----- | ------- |
-| SwinX2S   | Tiny      | `python train.py --config swinx2s_femur --model_size tiny --epochs 100 --batch_size 4`  | 4     | ~8 GB   |
-| SwinX2S   | **Small** | `python train.py --config swinx2s_femur --model_size small --epochs 150 --batch_size 4` | 4     | ~16 GB  |
-| SwinX2S   | Base      | `python train.py --config swinx2s_femur --model_size base --epochs 200 --batch_size 2`  | 2     | ~24 GB  |
-| TransVert | —         | `python train.py --config transvert_femur --epochs 150 --batch_size 4`                  | 4     | ~6 GB   |
+| SwinX2S   | Tiny      | `python -m src.train --config swinx2s_femur --model_size tiny --epochs 100 --batch_size 4`  | 4     | ~8 GB   |
+| SwinX2S   | **Small** | `python -m src.train --config swinx2s_femur --model_size small --epochs 150 --batch_size 4` | 4     | ~16 GB  |
+| SwinX2S   | Base      | `python -m src.train --config swinx2s_femur --model_size base --epochs 200 --batch_size 2`  | 2     | ~24 GB  |
+| TransVert | —         | `python -m src.train --config transvert_femur --epochs 150 --batch_size 4`                  | 4     | ~6 GB   |
 
 ### Hip
 
 | Model     | Size      | Command                                                                               | Batch | GPU Mem |
 | --------- | --------- | ------------------------------------------------------------------------------------- | ----- | ------- |
-| SwinX2S   | Tiny      | `python train.py --config swinx2s_hip --model_size tiny --epochs 100 --batch_size 2`  | 2     | ~12 GB  |
-| SwinX2S   | **Small** | `python train.py --config swinx2s_hip --model_size small --epochs 150 --batch_size 2` | 2     | ~24 GB  |
-| SwinX2S   | Base      | `python train.py --config swinx2s_hip --model_size base --epochs 200 --batch_size 1`  | 1     | ~40 GB  |
-| TransVert | —         | `python train.py --config transvert_hip --epochs 150 --batch_size 2`                  | 2     | ~10 GB  |
+| SwinX2S   | Tiny      | `python -m src.train --config swinx2s_hip --model_size tiny --epochs 100 --batch_size 2`  | 2     | ~12 GB  |
+| SwinX2S   | **Small** | `python -m src.train --config swinx2s_hip --model_size small --epochs 150 --batch_size 2` | 2     | ~24 GB  |
+| SwinX2S   | Base      | `python -m src.train --config swinx2s_hip --model_size base --epochs 200 --batch_size 1`  | 1     | ~40 GB  |
+| TransVert | —         | `python -m src.train --config transvert_hip --epochs 150 --batch_size 2`                  | 2     | ~10 GB  |
 
 ### Rib
 
 | Model     | Size      | Command                                                                               | Batch | GPU Mem |
 | --------- | --------- | ------------------------------------------------------------------------------------- | ----- | ------- |
-| SwinX2S   | Tiny      | `python train.py --config swinx2s_rib --model_size tiny --epochs 100 --batch_size 2`  | 2     | ~14 GB  |
-| SwinX2S   | **Small** | `python train.py --config swinx2s_rib --model_size small --epochs 150 --batch_size 1` | 1     | ~24 GB  |
-| SwinX2S   | Base      | `python train.py --config swinx2s_rib --model_size base --epochs 200 --batch_size 1`  | 1     | ~40 GB  |
-| TransVert | —         | `python train.py --config transvert_rib --epochs 150 --batch_size 2`                  | 2     | ~10 GB  |
+| SwinX2S   | Tiny      | `python -m src.train --config swinx2s_rib --model_size tiny --epochs 100 --batch_size 2`  | 2     | ~14 GB  |
+| SwinX2S   | **Small** | `python -m src.train --config swinx2s_rib --model_size small --epochs 150 --batch_size 1` | 1     | ~24 GB  |
+| SwinX2S   | Base      | `python -m src.train --config swinx2s_rib --model_size base --epochs 200 --batch_size 1`  | 1     | ~40 GB  |
+| TransVert | —         | `python -m src.train --config transvert_rib --epochs 150 --batch_size 2`                  | 2     | ~10 GB  |
 
 ### Verse19
 
 | Model     | Size      | Command                                                                                   | Batch | GPU Mem |
 | --------- | --------- | ----------------------------------------------------------------------------------------- | ----- | ------- |
-| SwinX2S   | Tiny      | `python train.py --config swinx2s_verse19 --model_size tiny --epochs 100 --batch_size 4`  | 4     | ~8 GB   |
-| SwinX2S   | **Small** | `python train.py --config swinx2s_verse19 --model_size small --epochs 150 --batch_size 2` | 2     | ~16 GB  |
-| SwinX2S   | Base      | `python train.py --config swinx2s_verse19 --model_size base --epochs 200 --batch_size 1`  | 1     | ~24 GB  |
-| TransVert | —         | `python train.py --config transvert_verse19 --epochs 150 --batch_size 4`                  | 4     | ~4 GB   |
+| SwinX2S   | Tiny      | `python -m src.train --config swinx2s_verse19 --model_size tiny --epochs 100 --batch_size 4`  | 4     | ~8 GB   |
+| SwinX2S   | **Small** | `python -m src.train --config swinx2s_verse19 --model_size small --epochs 150 --batch_size 2` | 2     | ~16 GB  |
+| SwinX2S   | Base      | `python -m src.train --config swinx2s_verse19 --model_size base --epochs 200 --batch_size 1`  | 1     | ~24 GB  |
+| TransVert | —         | `python -m src.train --config transvert_verse19 --epochs 150 --batch_size 4`                  | 4     | ~4 GB   |
 
 ### Verse20
 
 | Model     | Size      | Command                                                                                   | Batch | GPU Mem |
 | --------- | --------- | ----------------------------------------------------------------------------------------- | ----- | ------- |
-| SwinX2S   | Tiny      | `python train.py --config swinx2s_verse20 --model_size tiny --epochs 100 --batch_size 4`  | 4     | ~8 GB   |
-| SwinX2S   | **Small** | `python train.py --config swinx2s_verse20 --model_size small --epochs 150 --batch_size 2` | 2     | ~16 GB  |
-| SwinX2S   | Base      | `python train.py --config swinx2s_verse20 --model_size base --epochs 200 --batch_size 1`  | 1     | ~24 GB  |
-| TransVert | —         | `python train.py --config transvert_verse20 --epochs 150 --batch_size 4`                  | 4     | ~4 GB   |
+| SwinX2S   | Tiny      | `python -m src.train --config swinx2s_verse20 --model_size tiny --epochs 100 --batch_size 4`  | 4     | ~8 GB   |
+| SwinX2S   | **Small** | `python -m src.train --config swinx2s_verse20 --model_size small --epochs 150 --batch_size 2` | 2     | ~16 GB  |
+| SwinX2S   | Base      | `python -m src.train --config swinx2s_verse20 --model_size base --epochs 200 --batch_size 1`  | 1     | ~24 GB  |
+| TransVert | —         | `python -m src.train --config transvert_verse20 --epochs 150 --batch_size 4`                  | 4     | ~4 GB   |
 
 ### CTPelvic
 
 | Model     | Size      | Command                                                                                    | Batch | GPU Mem |
 | --------- | --------- | ------------------------------------------------------------------------------------------ | ----- | ------- |
-| SwinX2S   | Tiny      | `python train.py --config swinx2s_ctpelvic --model_size tiny --epochs 100 --batch_size 1`  | 1     | ~40 GB  |
-| SwinX2S   | **Small** | `python train.py --config swinx2s_ctpelvic --model_size small --epochs 150 --batch_size 1` | 1     | ~60 GB  |
-| SwinX2S   | Base      | `python train.py --config swinx2s_ctpelvic --model_size base --epochs 200 --batch_size 1`  | 1     | ~80 GB  |
-| TransVert | —         | `python train.py --config transvert_ctpelvic --epochs 150 --batch_size 1`                  | 1     | ~50 GB  |
+| SwinX2S   | Tiny      | `python -m src.train --config swinx2s_ctpelvic --model_size tiny --epochs 100 --batch_size 1`  | 1     | ~40 GB  |
+| SwinX2S   | **Small** | `python -m src.train --config swinx2s_ctpelvic --model_size small --epochs 150 --batch_size 1` | 1     | ~60 GB  |
+| SwinX2S   | Base      | `python -m src.train --config swinx2s_ctpelvic --model_size base --epochs 200 --batch_size 1`  | 1     | ~80 GB  |
+| TransVert | —         | `python -m src.train --config transvert_ctpelvic --epochs 150 --batch_size 1`                  | 1     | ~50 GB  |
 
 > **Note:** CTPelvic volumes (up to 546³) require A100 GPUs. All CTPelvic runs use batch_size=1.
 
@@ -142,22 +156,22 @@ If you only want to run **one command per dataset** (best accuracy/speed trade-o
 
 ```bash
 # Femur
-python train.py --config swinx2s_femur --model_size small --epochs 150 --batch_size 4
+python -m src.train --config swinx2s_femur --model_size small --epochs 150 --batch_size 4
 
 # Hip
-python train.py --config swinx2s_hip --model_size small --epochs 150 --batch_size 2
+python -m src.train --config swinx2s_hip --model_size small --epochs 150 --batch_size 2
 
 # Rib
-python train.py --config swinx2s_rib --model_size small --epochs 150 --batch_size 1
+python -m src.train --config swinx2s_rib --model_size small --epochs 150 --batch_size 1
 
 # Verse19
-python train.py --config swinx2s_verse19 --model_size small --epochs 150 --batch_size 2
+python -m src.train --config swinx2s_verse19 --model_size small --epochs 150 --batch_size 2
 
 # Verse20
-python train.py --config swinx2s_verse20 --model_size small --epochs 150 --batch_size 2
+python -m src.train --config swinx2s_verse20 --model_size small --epochs 150 --batch_size 2
 
 # CTPelvic (requires A100 60GB+)
-python train.py --config swinx2s_ctpelvic --model_size small --epochs 150 --batch_size 1
+python -m src.train --config swinx2s_ctpelvic --model_size small --epochs 150 --batch_size 1
 ```
 
 ---
@@ -192,21 +206,24 @@ Example log output:
 
 ## Saved Models
 
+Checkpoints are saved as `saved_models/<model_type>/[<size>/]<dataset>/` (the
+size level exists for SwinX2S runs only):
+
 ```
 saved_models/
-├── swinx2s/
-│   ├── small/
-│   │   ├── femur/
+├── femur/
+│   ├── swinx2s/
+│   │   ├── small/
 │   │   │   ├── best_epoch045_dice0.9100_loss0.0432.pth
 │   │   │   └── best_model_weights.pth
-│   │   ├── hip/
-│   │   └── ...
-│   ├── tiny/
-│   └── base/
-└── transvert/
-    ├── femur/
-    ├── hip/
-    └── ...
+│   │   ├── tiny/
+│   │   └── base/
+│   └── transvert/
+├── hip/
+├── rib/
+├── verse19/
+├── verse20/
+└── ctpelvik/
 ```
 
 ## Clinical Metrics
@@ -217,11 +234,17 @@ saved_models/
 | Hip / CTPelvic    | Pelvic Width (mm)     | Acetabular Diameter (mm) | Acetabular Depth (mm) |
 | Verse19 / Verse20 | Vertebral Height (mm) | Width (mm)               | Depth (mm)            |
 
-### Testing Hip Metrics
+## Inference API
 
 ```bash
-python test_hip_metrics.py "path/to/hip_mask.nii.gz"
+# Start the server (default: http://127.0.0.1:8000)
+python -m src.serve
+
+# Preload models at startup
+python -m src.serve --preload swinx2s_femur transvert_femur
 ```
+
+See `src/inference/README.md` for endpoint documentation.
 
 ## Troubleshooting
 
@@ -229,7 +252,7 @@ python test_hip_metrics.py "path/to/hip_mask.nii.gz"
 
 ```bash
 # Try tiny model with batch 1
-python train.py --config swinx2s_hip --model_size tiny --epochs 100 --batch_size 1
+python -m src.train --config swinx2s_hip --model_size tiny --epochs 100 --batch_size 1
 ```
 
 **No GPU?** Training will automatically fall back to CPU (very slow for production use).

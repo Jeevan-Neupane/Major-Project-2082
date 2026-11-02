@@ -113,19 +113,19 @@ def _get_clinical_eval_fn(clinical_task):
     """Return (eval_fn, metric_names) or (None, [])."""
     if clinical_task == "femur":
         try:
-            from utils.clinical.femur_metrics import evaluate_batch_clinical_metrics
+            from src.clinical.femur_metrics import evaluate_batch_clinical_metrics
             return evaluate_batch_clinical_metrics, _METRIC_NAMES["femur"]
         except ImportError:
             pass
     elif clinical_task == "hip":
         try:
-            from utils.clinical.hip_metrics import evaluate_batch_clinical_metrics
+            from src.clinical.hip_metrics import evaluate_batch_clinical_metrics
             return evaluate_batch_clinical_metrics, _METRIC_NAMES["hip"]
         except ImportError:
             pass
     elif clinical_task == "verse":
         try:
-            from utils.clinical.verse_metrics import evaluate_batch_clinical_metrics
+            from src.clinical.verse_metrics import evaluate_batch_clinical_metrics
             return evaluate_batch_clinical_metrics, _METRIC_NAMES["verse"]
         except ImportError:
             pass
@@ -149,7 +149,7 @@ def validate_one_epoch(model, val_loader, criterion, device, config,
     Returns:
         (avg_loss, avg_dice, avg_bce, avg_dice_loss, clinical_metrics_dict)
     """
-    from utils.training.metrics import compute_dice
+    from src.utils.training.metrics import compute_dice
 
     eval_fn, metric_names = _get_clinical_eval_fn(clinical_task)
 

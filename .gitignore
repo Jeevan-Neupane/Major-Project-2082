@@ -20,8 +20,8 @@ saved_models/
 
 # ─── Datasets ────────────────────────────────────────────────────────────────
 datasets/
-Data Preparation/DRR Generation/mhd_files/
-Data Preparation/DRR Generation/niigz_files/
+data_preparation/drr_generation/mhd_files/
+data_preparation/drr_generation/niigz_files/
 
 # ─── Training Logs ───────────────────────────────────────────────────────────
 logs/
@@ -80,6 +80,7 @@ frontend/yarn-error.log*
 
 # ─── Scan Data (runtime generated) ──────────────────────────────────────────
 frontend/scan_data/
+frontend/data/
 
 # ─── OS ──────────────────────────────────────────────────────────────────────
 .DS_Store

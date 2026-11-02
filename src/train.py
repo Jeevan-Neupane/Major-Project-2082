@@ -2,31 +2,32 @@
 X-Ray to 3D Bone Reconstruction - Training Script
 
 Usage:
-  python train.py --config swinx2s_femur                          # single run
-  python train.py --config swinx2s_femur --model_size small       # with model size
-  python train.py --config swinx2s_femur --no_wandb               # without W&B
-  python train.py --list_configs                                  # list configs
-  python train.py --batch                                         # batch mode
+  python -m src.train --config swinx2s_femur                          # single run
+  python -m src.train --config swinx2s_femur --model_size small       # with model size
+  python -m src.train --config swinx2s_femur --no_wandb               # without W&B
+  python -m src.train --list_configs                                  # list configs
+  python -m src.train --batch                                         # batch mode
 """
 import os
 import sys
-import torch
-import torch.optim as optim
-from torch.utils.data import DataLoader
-import wandb
 
-from configs import parse_args, apply_args_to_config, get_config
-from utils.data.dataset import BoneDataset, collate_bone
-from utils.training.losses import DiceBCELoss
-from utils.training.trainer import train_one_epoch, validate_one_epoch
-from utils.training.checkpoint import CheckpointManager
-from utils.training.logger import TrainingLogger
-from models.swinx2s import SwinX2S
-from models.transvert import TransVert
+# Ensure the repository root is on sys.path so `python src/train.py` works
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
+from src.configs import parse_args, apply_args_to_config, get_config
+from src.datasets import BoneDataset, collate_bone
+from src.utils.training.losses import DiceBCELoss
+from src.utils.training.trainer import train_one_epoch, validate_one_epoch
+from src.utils.training.checkpoint import CheckpointManager
+from src.utils.training.logger import TrainingLogger
+from src.models.swinx2s import SwinX2S
+from src.models.transvert import TransVert
 
 # Optional batch-mode support
 try:
-    from training_jobs import TRAINING_JOBS
+    from src.training_jobs import TRAINING_JOBS
     BATCH_MODE_AVAILABLE = True
 except ImportError:
     BATCH_MODE_AVAILABLE = False

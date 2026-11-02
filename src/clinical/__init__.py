@@ -5,15 +5,15 @@ Each module provides:
   - evaluate_batch_clinical_metrics(pred, gt, spacing)  → batch MAEs + per-sample details
 """
 
-from utils.clinical.femur_metrics import (
+from src.clinical.femur_metrics import (
     compute_femur_metrics,
     evaluate_batch_clinical_metrics as evaluate_femur_batch,
 )
-from utils.clinical.hip_metrics import (
+from src.clinical.hip_metrics import (
     compute_hip_metrics,
     evaluate_batch_clinical_metrics as evaluate_hip_batch,
 )
-from utils.clinical.verse_metrics import (
+from src.clinical.verse_metrics import (
     compute_verse_metrics,
     evaluate_batch_clinical_metrics as evaluate_verse_batch,
 )

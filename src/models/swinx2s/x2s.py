@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 from typing import MutableMapping, Sequence, Tuple, Union
 
-from .swinX2S.unetr_blocks import UnetrBasicBlock, UnetrUpBlock, UnetOutBlock
-from .swinX2S.swin_transformer import SwinTransformer
-from .swinX2S.transfusion import TransFusion
+from .unetr_blocks import UnetrBasicBlock, UnetrUpBlock, UnetOutBlock
+from .swin_transformer import SwinTransformer
+from .transfusion import TransFusion
 
 FeaturesDictType = MutableMapping[str, torch.Tensor]
 

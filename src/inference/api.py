@@ -22,14 +22,14 @@ from fastapi import FastAPI, File, UploadFile, HTTPException, Query
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-# Ensure project root importable
-_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Ensure the repository root is importable
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
-from inference.predictor import Predictor
-from inference.model_registry import list_available_models, MODEL_REGISTRY
-from inference.schemas import ModelInfo, PredictionResponse, HealthResponse
+from src.inference.predictor import Predictor
+from src.inference.model_registry import list_available_models, MODEL_REGISTRY
+from src.inference.schemas import ModelInfo, PredictionResponse, HealthResponse
 
 # ------------------------------------------------------------------ #
 # Globals

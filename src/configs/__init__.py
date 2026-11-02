@@ -1,12 +1,12 @@
 """Configuration package for X-Ray to 3D Bone Reconstruction."""
 
-from configs.config import (
+from src.configs.config import (
     get_config,
     list_configs,
     CONFIG_REGISTRY,
     BaseConfig,
 )
-from configs.args_parser import (
+from src.configs.args_parser import (
     parse_args,
     apply_args_to_config,
 )

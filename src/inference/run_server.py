@@ -2,17 +2,17 @@
 Entry point to start the inference API server.
 
 Usage:
-    python -m inference.run_server                    # default: localhost:8000
-    python -m inference.run_server --host 0.0.0.0     # expose to network
-    python -m inference.run_server --port 9000         # custom port
-    python -m inference.run_server --preload swinx2s_femur transvert_hip
+    python -m src.inference.run_server                    # default: localhost:8000
+    python -m src.inference.run_server --host 0.0.0.0     # expose to network
+    python -m src.inference.run_server --port 9000         # custom port
+    python -m src.inference.run_server --preload swinx2s_femur transvert_hip
 """
 import argparse
 import sys
 import os
 
-# Ensure project root is importable
-_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Ensure the repository root is importable
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
@@ -30,8 +30,8 @@ def main():
 
     # Preload models before starting server
     if args.preload:
-        from inference.predictor import Predictor
-        from inference.api import _loaded_predictors
+        from src.inference.predictor import Predictor
+        from src.inference.api import _loaded_predictors
         for key in args.preload:
             print(f"[startup] preloading {key}...")
             _loaded_predictors[key] = Predictor(key)
@@ -39,7 +39,7 @@ def main():
 
     import uvicorn
     uvicorn.run(
-        "inference.api:app",
+        "src.inference.api:app",
         host=args.host,
         port=args.port,
         reload=args.reload,

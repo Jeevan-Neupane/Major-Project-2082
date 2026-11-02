@@ -3,7 +3,7 @@ Model registry: maps each saved checkpoint to its config and weights path.
 """
 import os
 
-_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 _SAVED = os.path.join(_PROJECT_ROOT, "saved_models")
 
 

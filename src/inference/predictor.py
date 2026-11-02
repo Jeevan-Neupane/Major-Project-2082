@@ -11,15 +11,15 @@ import torch.nn.functional as F
 from PIL import Image
 from torchvision import transforms as T
 
-# Ensure project root is importable
-_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Ensure the repository root is importable
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
-from configs.config import get_config
-from models.swinx2s import SwinX2S
-from models.transvert import TransVert
-from inference.model_registry import get_model_info
+from src.configs.config import get_config
+from src.models.swinx2s import SwinX2S
+from src.models.transvert import TransVert
+from src.inference.model_registry import get_model_info
 
 
 class Predictor:
@@ -168,15 +168,15 @@ class Predictor:
         dataset = self.config.DATASET_NAME.lower()
         try:
             if "femur" in dataset:
-                from utils.clinical.femur_metrics import compute_femur_metrics
+                from src.clinical.femur_metrics import compute_femur_metrics
                 diameter, nsa, length = compute_femur_metrics(mask, spacing)
                 clinical = {"femoral_head_diameter_mm": diameter, "neck_shaft_angle_deg": nsa, "femur_length_mm": length}
             elif "hip" in dataset or "pelv" in dataset:
-                from utils.clinical.hip_metrics import compute_hip_metrics
+                from src.clinical.hip_metrics import compute_hip_metrics
                 pw, ad, adepth = compute_hip_metrics(mask, spacing)
                 clinical = {"pelvic_width_mm": pw, "acetabular_diameter_mm": ad, "acetabular_depth_mm": adepth}
             elif "verse" in dataset:
-                from utils.clinical.verse_metrics import compute_verse_metrics
+                from src.clinical.verse_metrics import compute_verse_metrics
                 h, w, d = compute_verse_metrics(mask, spacing)
                 clinical = {"vertebra_height_mm": h, "vertebra_width_mm": w, "vertebra_depth_mm": d}
         except Exception as e:

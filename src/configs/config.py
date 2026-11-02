@@ -9,7 +9,7 @@ class BaseConfig:
     MODEL_TYPE = "swinx2s"  # Options: "swinx2s", "transvert"
     
     # Common paths – resolved dynamically from this file's location
-    PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     DATA_DIR = os.path.join(PROJECT_ROOT, "datasets")
     SAVE_DIR = os.path.join(PROJECT_ROOT, "saved_models")
     LOG_DIR = os.path.join(PROJECT_ROOT, "logs")
@@ -467,5 +467,5 @@ def list_configs():
             print(f"  - {name}")
     
     print("\n" + "="*70)
-    print("Usage: python train.py --config <config_name>")
+    print("Usage: python -m src.train --config <config_name>")
     print("="*70 + "\n")

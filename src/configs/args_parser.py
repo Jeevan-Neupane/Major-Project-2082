@@ -2,7 +2,7 @@
 Command-line argument parser for training
 """
 import argparse
-from configs.config import CONFIG_REGISTRY, list_configs
+from src.configs.config import CONFIG_REGISTRY, list_configs
 
 
 def parse_args():
@@ -13,16 +13,16 @@ def parse_args():
         epilog="""
 Examples:
   # Train SwinX2S on Femur dataset
-  python train.py --config swinx2s_femur
+  python -m src.train --config swinx2s_femur
   
   # Train TransVert on Hip dataset with custom epochs
-  python train.py --config transvert_hip --epochs 50
+  python -m src.train --config transvert_hip --epochs 50
   
   # Train with custom batch size and learning rate
-  python train.py --config swinx2s_verse19 --batch_size 2 --lr 5e-4
+  python -m src.train --config swinx2s_verse19 --batch_size 2 --lr 5e-4
   
   # List all available configurations
-  python train.py --list_configs
+  python -m src.train --list_configs
         """
     )
     

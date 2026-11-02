@@ -1,8 +1,8 @@
 """Inference API for X-Ray to 3D Bone Reconstruction."""
 
 # Lazy imports to avoid pulling in heavy model dependencies at package level.
-# Use:  from inference.predictor import Predictor
-#       from inference.model_registry import MODEL_REGISTRY
+# Use:  from src.inference.predictor import Predictor
+#       from src.inference.model_registry import MODEL_REGISTRY
 
 __all__ = ["Predictor", "MODEL_REGISTRY", "get_model_info"]
 
