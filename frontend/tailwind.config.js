@@ -19,6 +19,23 @@ module.exports = {
                     800: "#1e40af",
                     900: "#1e3a8a",
                 },
+                // Ivory bone-tone accent — the subject of the platform itself.
+                bone: {
+                    50: "#F8F6F0",
+                    100: "#EFEAE0",
+                    200: "#E2DAC9",
+                    300: "#CFC4AC",
+                    400: "#B3A687",
+                    500: "#96886B",
+                    600: "#786B51",
+                    700: "#5E5440",
+                    800: "#413A2C",
+                    900: "#2A251D",
+                },
+            },
+            fontFamily: {
+                clinical: ['"IBM Plex Sans"', "system-ui", "-apple-system", '"Segoe UI"', "sans-serif"],
+                readout: ['"IBM Plex Mono"', "ui-monospace", "Consolas", "monospace"],
             },
         },
     },

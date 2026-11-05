@@ -94,10 +94,16 @@ class SwinX2S_Femur_Tiny(BaseConfig):
     FEATURE_SIZE = 32
     DEPTHS = (2, 2, 6, 2)
     NUM_HEADS = (1, 2, 4, 8)
-    WINDOW_SIZE = (8, 8)
+    WINDOW_SIZE = (7, 7)
     NORM_NAME = "batch"
-    FUSION_DEPTHS = (2, 2, 2, 2, 2, 2)
+    FUSION_DEPTHS = (1, 1, 1, 1, 1, 1)
     SPATIAL_DIMS = 3
+
+
+class SwinX2S_Femur_Tiny_W8W8F2(SwinX2S_Femur_Tiny):
+    """SwinX2S Tiny for Femur with WINDOW_SIZE=(8,8), FUSION_DEPTHS=(2,2,2,2,2,2)"""
+    WINDOW_SIZE = (8, 8)
+    FUSION_DEPTHS = (2, 2, 2, 2, 2, 2)
 
 
 class SwinX2S_Femur(BaseConfig):
@@ -310,6 +316,31 @@ class SwinX2S_CTPelvic(BaseConfig):
     SPATIAL_DIMS = 3
 
 
+class SwinX2S_Biplanar_Base(SwinX2S_CTPelvic):
+    """SwinX2S small (feature_size=64, window 7x7, fusion depth 1) matching
+    checkpoints trained in biplanar-bone-reconstruction-models."""
+    WINDOW_SIZE = (7, 7)
+    FUSION_DEPTHS = (1, 1, 1, 1, 1, 1)
+
+
+class SwinX2S_Biplanar_Femur(SwinX2S_Femur_Tiny):
+    """SwinX2S tiny for Femur matching biplanar checkpoints (window 7x7)."""
+    WINDOW_SIZE = (7, 7)
+    FUSION_DEPTHS = (1, 1, 1, 1, 1, 1)
+
+
+class SwinX2S_Biplanar_Verse19(SwinX2S_Verse19):
+    """SwinX2S tiny for Verse19 matching biplanar checkpoints (window 7x7)."""
+    WINDOW_SIZE = (7, 7)
+    FUSION_DEPTHS = (1, 1, 1, 1, 1, 1)
+
+
+class SwinX2S_Biplanar_Verse20(SwinX2S_Verse20):
+    """SwinX2S tiny for Verse20 matching biplanar checkpoints (window 7x7)."""
+    WINDOW_SIZE = (7, 7)
+    FUSION_DEPTHS = (1, 1, 1, 1, 1, 1)
+
+
 # ============================================================================
 # TransVert Configurations
 # ============================================================================
@@ -416,6 +447,114 @@ class TransVert_CTPelvic(BaseConfig):
     INTERMEDIATE_DEPTH = 32  # 3D depth = 32 * 4 = 128
 
 
+class MultiScaleDualViewCNN_Femur(BaseConfig):
+    """MultiScaleDualViewCNN config for Femur dataset
+    Original CT: 85x85x85 (uniform, 1.5mm iso), X-ray: 128x128
+    2D input: 96x128 -> 3D volume: 96x96x128
+    """
+    MODEL_TYPE = "multiscale_dualviewcnn"
+    DATASET_NAME = "femur"
+    DATA_ROOT = os.path.join(BaseConfig.DATA_DIR, "Total Segmentator", "Femur")
+
+    IMG_SIZE = (96, 128)
+    VOLUME_SIZE = (96, 96, 128)
+    BATCH_SIZE = 4
+    IN_CHANNELS = 1
+    OUT_CHANNELS = 1
+    BASE_CHANNELS = 16
+    NUM_SCALES = 4
+
+
+class MultiScaleDualViewCNN_Hip(BaseConfig):
+    """MultiScaleDualViewCNN config for Hip dataset
+    Original CT: 192x192x192, X-ray: 288x288
+    2D input: 128x160 -> 3D volume: 128x128x160
+    """
+    MODEL_TYPE = "multiscale_dualviewcnn"
+    DATASET_NAME = "hip"
+    DATA_ROOT = os.path.join(BaseConfig.DATA_DIR, "Total Segmentator", "Hip")
+
+    IMG_SIZE = (128, 160)
+    VOLUME_SIZE = (128, 128, 160)
+    BATCH_SIZE = 2
+    IN_CHANNELS = 1
+    OUT_CHANNELS = 1
+    BASE_CHANNELS = 16
+    NUM_SCALES = 4
+
+
+class MultiScaleDualViewCNN_Rib(BaseConfig):
+    """MultiScaleDualViewCNN config for Rib dataset
+    Original CT: 213x213x213, X-ray: 320x320
+    2D input: 128x160 -> 3D volume: 128x128x160
+    """
+    MODEL_TYPE = "multiscale_dualviewcnn"
+    DATASET_NAME = "rib"
+    DATA_ROOT = os.path.join(BaseConfig.DATA_DIR, "Total Segmentator", "Rib")
+
+    IMG_SIZE = (128, 160)
+    VOLUME_SIZE = (128, 128, 160)
+    BATCH_SIZE = 2
+    IN_CHANNELS = 1
+    OUT_CHANNELS = 1
+    BASE_CHANNELS = 16
+    NUM_SCALES = 4
+
+
+class MultiScaleDualViewCNN_Verse19(BaseConfig):
+    """MultiScaleDualViewCNN config for Verse19 dataset
+    Original CT: 96x96x96 (variable), X-ray: 96x96
+    2D input: 96x128 -> 3D volume: 96x96x128
+    """
+    MODEL_TYPE = "multiscale_dualviewcnn"
+    DATASET_NAME = "verse19"
+    DATA_ROOT = os.path.join(BaseConfig.DATA_DIR, "Verse", "verse19")
+
+    IMG_SIZE = (96, 128)
+    VOLUME_SIZE = (96, 96, 128)
+    BATCH_SIZE = 4
+    IN_CHANNELS = 1
+    OUT_CHANNELS = 1
+    BASE_CHANNELS = 16
+    NUM_SCALES = 4
+
+
+class MultiScaleDualViewCNN_Verse20(BaseConfig):
+    """MultiScaleDualViewCNN config for Verse20 dataset
+    Original CT: 133x137x133 (variable), X-ray: 96x96
+    2D input: 96x128 -> 3D volume: 96x96x128
+    """
+    MODEL_TYPE = "multiscale_dualviewcnn"
+    DATASET_NAME = "verse20"
+    DATA_ROOT = os.path.join(BaseConfig.DATA_DIR, "Verse", "verse20")
+
+    IMG_SIZE = (96, 128)
+    VOLUME_SIZE = (96, 96, 128)
+    BATCH_SIZE = 4
+    IN_CHANNELS = 1
+    OUT_CHANNELS = 1
+    BASE_CHANNELS = 16
+    NUM_SCALES = 4
+
+
+class MultiScaleDualViewCNN_CTPelvic(BaseConfig):
+    """MultiScaleDualViewCNN config for CTPelvic dataset
+    Original CT: 368x360x368 (highly variable), X-ray: 288x288
+    2D input: 128x160 -> 3D volume: 128x128x160
+    """
+    MODEL_TYPE = "multiscale_dualviewcnn"
+    DATASET_NAME = "ctpelvic"
+    DATA_ROOT = os.path.join(BaseConfig.DATA_DIR, "ctpelvik")
+
+    IMG_SIZE = (128, 160)
+    VOLUME_SIZE = (128, 128, 160)
+    BATCH_SIZE = 1
+    IN_CHANNELS = 1
+    OUT_CHANNELS = 1
+    BASE_CHANNELS = 16
+    NUM_SCALES = 4
+
+
 # ============================================================================
 # Config Registry
 # ============================================================================
@@ -431,6 +570,13 @@ CONFIG_REGISTRY = {
     "swinx2s_verse19_small": SwinX2S_Verse19_Small,  # small ~130M (matches saved checkpoint)
     "swinx2s_verse20": SwinX2S_Verse20,
     "swinx2s_ctpelvic": SwinX2S_CTPelvic,
+    "swinx2s_femur_tiny": SwinX2S_Femur_Tiny_W8W8F2,   # legacy (8,8) tiny
+    "swinx2s_biplanar_femur": SwinX2S_Biplanar_Femur,
+    "swinx2s_biplanar_verse19": SwinX2S_Biplanar_Verse19,
+    "swinx2s_biplanar_verse20": SwinX2S_Biplanar_Verse20,
+    "swinx2s_biplanar_hip": SwinX2S_Biplanar_Base,
+    "swinx2s_biplanar_rib": SwinX2S_Biplanar_Base,
+    "swinx2s_biplanar_ctpelvic": SwinX2S_Biplanar_Base,
     
     # TransVert configs
     "transvert_femur": TransVert_Femur,
@@ -439,6 +585,22 @@ CONFIG_REGISTRY = {
     "transvert_verse19": TransVert_Verse19,
     "transvert_verse20": TransVert_Verse20,
     "transvert_ctpelvic": TransVert_CTPelvic,
+
+    # DualViewCNN (= TransVert family) configs
+    "dualviewcnn_femur": TransVert_Femur,
+    "dualviewcnn_hip": TransVert_Hip,
+    "dualviewcnn_rib": TransVert_Rib,
+    "dualviewcnn_verse19": TransVert_Verse19,
+    "dualviewcnn_verse20": TransVert_Verse20,
+    "dualviewcnn_ctpelvic": TransVert_CTPelvic,
+
+    # MultiScaleDualViewCNN configs
+    "multiscale_dualviewcnn_femur": MultiScaleDualViewCNN_Femur,
+    "multiscale_dualviewcnn_hip": MultiScaleDualViewCNN_Hip,
+    "multiscale_dualviewcnn_rib": MultiScaleDualViewCNN_Rib,
+    "multiscale_dualviewcnn_verse19": MultiScaleDualViewCNN_Verse19,
+    "multiscale_dualviewcnn_verse20": MultiScaleDualViewCNN_Verse20,
+    "multiscale_dualviewcnn_ctpelvic": MultiScaleDualViewCNN_CTPelvic,
 }
 
 
@@ -463,7 +625,12 @@ def list_configs():
     
     print("\n🔹 TransVert Configs:")
     for name in CONFIG_REGISTRY:
-        if name.startswith("transvert"):
+        if name.startswith("transvert") or name.startswith("dualviewcnn"):
+            print(f"  - {name}")
+
+    print("\n🔹 MultiScaleDualViewCNN Configs:")
+    for name in CONFIG_REGISTRY:
+        if name.startswith("multiscale_dualviewcnn"):
             print(f"  - {name}")
     
     print("\n" + "="*70)

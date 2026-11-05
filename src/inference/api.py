@@ -14,6 +14,7 @@ import sys
 import uuid
 import shutil
 import tempfile
+import time
 from contextlib import asynccontextmanager
 
 import numpy as np
@@ -56,7 +57,8 @@ app = FastAPI(
     version="1.0.0",
     description=(
         "Upload AP and (optionally) lateral X-ray images to reconstruct "
-        "a 3D bone volume using SwinX2S or TransVert models."
+        "a 3D bone volume using SwinX2S, TransVert, DualViewCNN, or "
+        "MultiScaleDualViewCNN models."
     ),
     lifespan=lifespan,
 )
@@ -135,8 +137,9 @@ async def predict(
     """
     Run inference and return the reconstructed 3D volume as a downloadable .nii.gz file.
     """
-    predictor = _get_predictor(model_key)
+    t0 = time.perf_counter()
 
+    predictor = _get_predictor(model_key)
     ap_bytes = await _read_upload(ap_image)
     lat_bytes = await _read_upload(lat_image) if lat_image is not None else None
 
@@ -146,6 +149,18 @@ async def predict(
     uid = uuid.uuid4().hex[:12]
     fname = f"{model_key}_{uid}.nii.gz"
     path = _save_nifti(result["volume_binary"], (1.0, 1.0, 1.0), fname)
+
+    print(
+        f"[timing] POST /predict/{model_key} responded in "
+        f"{time.perf_counter() - t0:.2f}s",
+        flush=True,
+    )
+
+    print(
+        f"[timing] /predict/{model_key} done in {time.perf_counter() - t0:.2f}s "
+        f"(incl. model load + NIfTI save)",
+        flush=True,
+    )
 
     return FileResponse(
         path,
@@ -231,6 +246,8 @@ async def predict_mesh(
     Run inference and return a triangle mesh (vertices + faces + normals)
     extracted via marching cubes.  Ready for 3D rendering in the browser.
     """
+    t0 = time.perf_counter()
+
     predictor = _get_predictor(model_key)
 
     ap_bytes = await _read_upload(ap_image)
@@ -240,6 +257,12 @@ async def predict_mesh(
         ap_bytes, lat_bytes,
         threshold=threshold,
         smooth_sigma=smooth,
+    )
+
+    print(
+        f"[timing] POST /predict/{model_key}/mesh responded in "
+        f"{time.perf_counter() - t0:.2f}s",
+        flush=True,
     )
 
     return JSONResponse(content={

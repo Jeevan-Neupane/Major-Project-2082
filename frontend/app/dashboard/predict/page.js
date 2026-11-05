@@ -1,7 +1,8 @@
 ﻿"use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import dynamic from "next/dynamic";
+import ModelSelect from "@/components/ModelSelect";
 
 const BoneViewer = dynamic(() => import("@/components/BoneViewer"), {
     ssr: false,
@@ -20,6 +21,8 @@ const ANATOMY_MAP = {
     verse20: "Vertebra (v20)",
     ctpelvic: "CT Pelvic",
 };
+
+const ANATOMY_MAP_ORDER = Object.keys(ANATOMY_MAP);
 
 function StepBadge({ n, done }) {
     return (
@@ -84,6 +87,22 @@ export default function PredictPage() {
             })
             .catch(() => { });
     }, []);
+
+    // Group models by anatomy so each option reads "Human Name — architecture"
+    const groupedModels = useMemo(() => {
+        const groups = {};
+        for (const m of models) {
+            const anatomyKey = ANATOMY_MAP_ORDER.find((a) => m.model_key.includes(a));
+            const label = anatomyKey ? ANATOMY_MAP[anatomyKey] : "Other";
+            (groups[label] ??= []).push(m);
+        }
+        return groups;
+    }, [models]);
+
+    const selectedInfo = useMemo(
+        () => models.find((m) => m.model_key === selectedModel) || null,
+        [models, selectedModel]
+    );
 
     // Search patients (debounced)
     useEffect(() => {
@@ -211,7 +230,7 @@ export default function PredictPage() {
         }
     }
 
-    const anatomy = Object.keys(ANATOMY_MAP).find((k) => selectedModel.includes(k));
+    const anatomy = ANATOMY_MAP_ORDER.find((k) => selectedModel.includes(k));
     const step1Done = !!savedPatient;
 
     return (
@@ -370,15 +389,20 @@ export default function PredictPage() {
                         </h2>
 
                         <div>
-                            <label className="block text-xs font-medium text-gray-400 mb-1">AI Model</label>
-                            <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)}
-                                className="w-full px-3 py-2 rounded-lg border border-gray-700 bg-gray-800 text-gray-100 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none">
-                                {models.length === 0 && <option value="">No models available is the AI backend running?</option>}
-                                {models.map((m) => (
-                                    <option key={m.model_key} value={m.model_key}>{m.model_key} {m.description}</option>
-                                ))}
-                            </select>
-                            {anatomy && <p className="mt-1 text-xs text-gray-500">Anatomy: {ANATOMY_MAP[anatomy]}</p>}
+                            <label className="flex items-center justify-between text-xs font-medium text-gray-400 mb-1">
+                                <span>AI Model</span>
+                                {models.length > 0 && (
+                                    <span className="text-gray-600 font-normal">{models.length} available</span>
+                                )}
+                            </label>
+                            <ModelSelect
+                                models={models}
+                                groupedModels={groupedModels}
+                                selectedInfo={selectedInfo}
+                                value={selectedModel}
+                                onChange={setSelectedModel}
+                                anatomyLabel={anatomy ? ANATOMY_MAP[anatomy] : null}
+                            />
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">

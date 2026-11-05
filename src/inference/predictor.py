@@ -19,6 +19,7 @@ if _PROJECT_ROOT not in sys.path:
 from src.configs.config import get_config
 from src.models.swinx2s import SwinX2S
 from src.models.transvert import TransVert
+from src.models.multiscale_dualview_cnn import MultiScaleDualViewCNN
 from src.inference.model_registry import get_model_info
 
 
@@ -35,10 +36,14 @@ class Predictor:
         self.weights_path = info["weights"]
         self.device = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
 
-        # Resolve 2D / 3D sizes (same logic as train.py)
+        # Set MODEL_TYPE="dualviewcnn" to build the dedicated DualViewCNN
+        # architecture; "transvert" still builds the TransVert class.
         if self.config.MODEL_TYPE == "swinx2s":
             self.img_size_2d = tuple(self.config.IMG_SIZE[1:])  # (H, W)
             self.img_size_3d = tuple(self.config.IMG_SIZE)      # (D, H, W)
+        elif self.config.MODEL_TYPE == "multiscale_dualviewcnn":
+            self.img_size_2d = tuple(self.config.IMG_SIZE)      # (H, W)
+            self.img_size_3d = tuple(getattr(self.config, "VOLUME_SIZE", self.config.IMG_SIZE))
         else:
             self.img_size_2d = tuple(self.config.IMG_SIZE)      # (H, W)
             self.img_size_3d = (
@@ -81,6 +86,14 @@ class Predictor:
                 out_channels=cfg.OUT_CHANNELS,
                 intermediate_depth=cfg.INTERMEDIATE_DEPTH,
             )
+        elif cfg.MODEL_TYPE == "multiscale_dualviewcnn":
+            model = MultiScaleDualViewCNN(
+                output_size=tuple(getattr(cfg, "VOLUME_SIZE", cfg.IMG_SIZE)),
+                in_channels=cfg.IN_CHANNELS,
+                out_channels=cfg.OUT_CHANNELS,
+                base_channels=getattr(cfg, "BASE_CHANNELS", 16),
+                num_scales=getattr(cfg, "NUM_SCALES", 4),
+            )
         else:
             raise ValueError(f"Unknown model type: {cfg.MODEL_TYPE}")
 
@@ -91,7 +104,23 @@ class Predictor:
         ckpt = torch.load(self.weights_path, map_location=self.device, weights_only=False)
         # Support both raw state_dict and wrapped checkpoint
         state_dict = ckpt.get("model_state_dict", ckpt)
-        model.load_state_dict(state_dict)
+
+        if cfg.MODEL_TYPE == "swinx2s":
+            # Biplanar checkpoints were trained with window_size=(7,7) and
+            # fusion depth 1 while the current src models use (8,8) / depth 2;
+            # buffers built at construction (attention bias tables, masks) and
+            # the extra cross-attention layer are therefore incompatible.
+            # Build the exact key set and load compatibly.
+            model_keys = set(model.state_dict().keys())
+            skip_prefixes = ("cross_atte", "swinViT.layers.", "swinViT.patch_embed.", "swinViT.norm.")
+            filtered = {}
+            for k, v in state_dict.items():
+                if k.startswith(skip_prefixes) and k not in model_keys:
+                    continue
+                filtered[k] = v
+            model.load_state_dict(filtered, strict=False)
+        else:
+            model.load_state_dict(state_dict)
         model.to(self.device)
         model.eval()
         return model

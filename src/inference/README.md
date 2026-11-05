@@ -1,6 +1,7 @@
 # Inference API — X-Ray to 3D Bone Reconstruction
 
-FastAPI-based REST API for running inference with trained SwinX2S and TransVert models.
+FastAPI-based REST API for running inference with trained SwinX2S, TransVert,
+DualViewCNN and MultiScaleDualViewCNN models.
 
 ## Setup
 
@@ -41,6 +42,29 @@ The Swagger UI is at **http://localhost:8000/docs** once the server is running.
 | `transvert_verse20`  | TransVert    | Verse20   | —     |
 | `transvert_ctpelvic` | TransVert    | CT-Pelvic | —     |
 
+### Biplanar bone-reconstruction checkpoints (added from `biplanar-bone-reconstruction-models`)
+
+| Model Key                            | Architecture            | Anatomy   | Best val Dice |
+| ------------------------------------ | ----------------------- | --------- | ------------- |
+| `dualviewcnn_femur`                  | DualViewCNN (TransVert) | Femur     | ~0.787        |
+| `dualviewcnn_hip`                    | DualViewCNN (TransVert) | Hip       | ~0.582        |
+| `dualviewcnn_rib`                    | DualViewCNN (TransVert) | Rib       | ~0.194        |
+| `dualviewcnn_verse19`                | DualViewCNN (TransVert) | Verse19   | ~0.472        |
+| `dualviewcnn_verse20`                | DualViewCNN (TransVert) | Verse20   | ~0.468        |
+| `dualviewcnn_ctpelvic`               | DualViewCNN (TransVert) | CT-Pelvic | ~0.480        |
+| `multiscale_dualviewcnn_femur`       | MultiScaleDualViewCNN   | Femur     | ~0.925        |
+| `multiscale_dualviewcnn_hip`         | MultiScaleDualViewCNN   | Hip       | ~0.802        |
+| `multiscale_dualviewcnn_rib`         | MultiScaleDualViewCNN   | Rib       | ~0.395        |
+| `multiscale_dualviewcnn_verse19`     | MultiScaleDualViewCNN   | Verse19   | ~0.860        |
+| `multiscale_dualviewcnn_verse20`     | MultiScaleDualViewCNN   | Verse20   | ~0.850        |
+| `multiscale_dualviewcnn_ctpelvic`    | MultiScaleDualViewCNN   | CT-Pelvic | —             |
+| `swinx2s_biplanar_femur`             | SwinX2S-Tiny            | Femur     | ~0.903        |
+| `swinx2s_biplanar_hip`               | SwinX2S-Small           | Hip       | ~0.705        |
+| `swinx2s_biplanar_rib`               | SwinX2S-Small           | Rib       | ~0.157        |
+| `swinx2s_biplanar_verse19`           | SwinX2S-Tiny            | Verse19   | ~0.822        |
+| `swinx2s_biplanar_verse20`           | SwinX2S-Tiny            | Verse20   | ~0.818        |
+| `swinx2s_biplanar_ctpelvic`          | SwinX2S-Small           | CT-Pelvic | ~0.042 (partial) |
+
 ## API Endpoints
 
 ### `GET /health`
@@ -65,6 +89,14 @@ curl -X POST "http://localhost:8000/predict/swinx2s_femur" \
 curl -X POST "http://localhost:8000/predict/swinx2s_femur" \
   -F "ap_image=@ap_xray.png" \
   -F "lat_image=@lat_xray.png" \
+  -o output.nii.gz
+```
+
+#### Example with a biplanar checkpoint
+
+```bash
+curl -X POST "http://localhost:8000/predict/multiscale_dualviewcnn_femur" \
+  -F "ap_image=@ap_xray.png" \
   -o output.nii.gz
 ```
 

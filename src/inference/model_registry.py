@@ -72,6 +72,102 @@ MODEL_REGISTRY = {
         "weights": os.path.join(_SAVED, "ctpelvik", "transvert", "ctpelvic_transvert_best.pth"),
         "description": "TransVert for CT-Pelvic",
     },
+
+    # ── DualViewCNN models (biplanar bone reconstruction) ──
+    "dualviewcnn_femur": {
+        "config_name": "dualviewcnn_femur",
+        "weights": os.path.join(_SAVED, "femur", "dualviewcnn", "best_model_weights.pth"),
+        "description": "DualViewCNN for Femur (biplanar; best val Dice ~0.787)",
+    },
+    "dualviewcnn_hip": {
+        "config_name": "dualviewcnn_hip",
+        "weights": os.path.join(_SAVED, "hip", "dualviewcnn", "best_model_weights.pth"),
+        "description": "DualViewCNN for Hip (biplanar; best val Dice ~0.582)",
+    },
+    "dualviewcnn_rib": {
+        "config_name": "dualviewcnn_rib",
+        "weights": os.path.join(_SAVED, "rib", "dualviewcnn", "best_model_weights.pth"),
+        "description": "DualViewCNN for Rib (biplanar; best val Dice ~0.194)",
+    },
+    "dualviewcnn_verse19": {
+        "config_name": "dualviewcnn_verse19",
+        "weights": os.path.join(_SAVED, "verse19", "dualviewcnn", "best_model_weights.pth"),
+        "description": "DualViewCNN for Verse19 (biplanar; best val Dice ~0.472)",
+    },
+    "dualviewcnn_verse20": {
+        "config_name": "dualviewcnn_verse20",
+        "weights": os.path.join(_SAVED, "verse20", "dualviewcnn", "best_model_weights.pth"),
+        "description": "DualViewCNN for Verse20 (biplanar; best val Dice ~0.468)",
+    },
+    "dualviewcnn_ctpelvic": {
+        "config_name": "dualviewcnn_ctpelvic",
+        "weights": os.path.join(_SAVED, "ctpelvik", "dualviewcnn", "best_model_weights.pth"),
+        "description": "DualViewCNN for CT-Pelvic (biplanar; best val Dice ~0.480)",
+    },
+
+    # ── MultiScaleDualViewCNN models (biplanar bone reconstruction) ──
+    "multiscale_dualviewcnn_femur": {
+        "config_name": "multiscale_dualviewcnn_femur",
+        "weights": os.path.join(_SAVED, "femur", "multiscale_dualviewcnn", "best_model_weights.pth"),
+        "description": "MultiScaleDualViewCNN for Femur (biplanar; best val Dice ~0.925)",
+    },
+    "multiscale_dualviewcnn_hip": {
+        "config_name": "multiscale_dualviewcnn_hip",
+        "weights": os.path.join(_SAVED, "hip", "multiscale_dualviewcnn", "best_model_weights.pth"),
+        "description": "MultiScaleDualViewCNN for Hip (biplanar; best val Dice ~0.802)",
+    },
+    "multiscale_dualviewcnn_rib": {
+        "config_name": "multiscale_dualviewcnn_rib",
+        "weights": os.path.join(_SAVED, "rib", "multiscale_dualviewcnn", "best_model_weights.pth"),
+        "description": "MultiScaleDualViewCNN for Rib (biplanar; best val Dice ~0.395)",
+    },
+    "multiscale_dualviewcnn_verse19": {
+        "config_name": "multiscale_dualviewcnn_verse19",
+        "weights": os.path.join(_SAVED, "verse19", "multiscale_dualviewcnn", "best_model_weights.pth"),
+        "description": "MultiScaleDualViewCNN for Verse19 (biplanar; best val Dice ~0.860)",
+    },
+    "multiscale_dualviewcnn_verse20": {
+        "config_name": "multiscale_dualviewcnn_verse20",
+        "weights": os.path.join(_SAVED, "verse20", "multiscale_dualviewcnn", "best_model_weights.pth"),
+        "description": "MultiScaleDualViewCNN for Verse20 (biplanar; best val Dice ~0.850)",
+    },
+    "multiscale_dualviewcnn_ctpelvic": {
+        "config_name": "multiscale_dualviewcnn_ctpelvic",
+        "weights": os.path.join(_SAVED, "ctpelvik", "multiscale_dualviewcnn", "best_model_weights.pth"),
+        "description": "MultiScaleDualViewCNN for CT-Pelvic (biplanar)",
+    },
+
+    # ── SwinX2S models (biplanar bone reconstruction) ──
+    "swinx2s_biplanar_femur": {
+        "config_name": "swinx2s_biplanar_femur",
+        "weights": os.path.join(_SAVED, "femur", "swinx2s_biplanar", "best_model_weights.pth"),
+        "description": "SwinX2S-Tiny for Femur (biplanar; best val Dice ~0.903)",
+    },
+    "swinx2s_biplanar_hip": {
+        "config_name": "swinx2s_biplanar_hip",
+        "weights": os.path.join(_SAVED, "hip", "swinx2s_biplanar", "best_model_weights.pth"),
+        "description": "SwinX2S-Small for Hip (biplanar; best val Dice ~0.705)",
+    },
+    "swinx2s_biplanar_rib": {
+        "config_name": "swinx2s_biplanar_rib",
+        "weights": os.path.join(_SAVED, "rib", "swinx2s_biplanar", "best_model_weights.pth"),
+        "description": "SwinX2S-Small for Rib (biplanar; best val Dice ~0.157)",
+    },
+    "swinx2s_biplanar_verse19": {
+        "config_name": "swinx2s_biplanar_verse19",
+        "weights": os.path.join(_SAVED, "verse19", "swinx2s_biplanar", "best_model_weights.pth"),
+        "description": "SwinX2S-Tiny for Verse19 (biplanar; best val Dice ~0.822)",
+    },
+    "swinx2s_biplanar_verse20": {
+        "config_name": "swinx2s_biplanar_verse20",
+        "weights": os.path.join(_SAVED, "verse20", "swinx2s_biplanar", "best_model_weights.pth"),
+        "description": "SwinX2S-Tiny for Verse20 (biplanar; best val Dice ~0.818)",
+    },
+    "swinx2s_biplanar_ctpelvic": {
+        "config_name": "swinx2s_biplanar_ctpelvic",
+        "weights": os.path.join(_SAVED, "ctpelvik", "swinx2s_biplanar", "best_model_weights.pth"),
+        "description": "SwinX2S-Small for CT-Pelvic (biplanar; best val Dice ~0.042, partially trained)",
+    },
 }
 
 

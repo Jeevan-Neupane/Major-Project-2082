@@ -23,3 +23,23 @@ body {
   background: #475569;
   border-radius: 3px;
 }
+
+.font-clinical,
+.font-readout {
+  font-display: swap;
+}
+.font-readout {
+  font-feature-settings: "tnum" 1;
+  letter-spacing: 0.01em;
+}
+
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
