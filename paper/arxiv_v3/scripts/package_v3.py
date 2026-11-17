@@ -1,6 +1,6 @@
 """Assemble the arXiv source package.
 
-arxiv_v2.zip contains main.tex, main.bbl, references.bib, the tables and figures that main.tex uses, and anc/
+arxiv_v3.zip contains main.tex, main.bbl, references.bib, the tables and figures that main.tex uses, and anc/
 (ancillary evidence; see anc_README.md). Build the paper first:
   latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=build main.tex
 The code, results, splits and checks in anc/ are taken from the clean code repository
@@ -11,14 +11,14 @@ import re
 import shutil
 import zipfile
 
-A = Path(__file__).resolve().parent.parent          # paper/arxiv_v2
+A = Path(__file__).resolve().parent.parent          # paper/arxiv_v3
 P = A.parent                                         # paper/
 R = P.parent                                         # repository root
 C = R.parent / "biplanar-bone-reconstruction"         # clean code repository
 EV = C / "results"
 
 shutil.copy2(A / "build" / "main.bbl", A / "main.bbl")
-shutil.copy2(A / "build" / "main.pdf", A / "final_paper_v2.pdf")
+shutil.copy2(A / "build" / "main.pdf", A / "final_paper_v3.pdf")
 
 tex = (A / "main.tex").read_text()
 figures = sorted({A / f for f in re.findall(r"\\includegraphics(?:\[[^\]]*\])?\{([^}]+)\}", tex)})
@@ -34,7 +34,8 @@ for split in ["val", "test"]:
         anc[f"anc/{split}/{f.name}"] = f
 for f in sorted((C / "splits").glob("*.json")):
     anc[f"anc/splits/{f.name}"] = f
-for f in ["data_flip_ap.json", "models_femur.json", "models_hip.json"]:
+for f in ["data_flip_ap.json"] + sorted(p.name for p in (EV / "geometry_check").glob("models_*.json")
+                                         if "final" not in p.name):
     anc[f"anc/geometry_check/{f}"] = EV / "geometry_check" / f
 # training logs of the 18 runs (the run folders are listed in the evidence JSONs)
 import json
@@ -61,7 +62,7 @@ allowed = re.compile(r"^[A-Za-z0-9_+\-.,=/]+$")
 for name in list(anc) + [str(f.relative_to(A)) for f in source]:
     assert allowed.match(name), f"arXiv does not allow this file name: {name}"
 
-out = A / "arxiv_v2.zip"
+out = A / "arxiv_v3.zip"
 with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
     for f in source:
         z.write(f, f.relative_to(A))

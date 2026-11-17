@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Replace the contents of the Hugging Face model repo with the staged models (see scripts/stage_hf_fair_v2.py).
+"""Replace the contents of the Hugging Face model repo with the staged models (see scripts/stage_hf.py).
 
-One commit adds every staged file and removes every other file in the repo (the earlier models), except
-.gitattributes. The earlier files stay in the repo's commit history.
+One commit adds every staged file and removes every other file in the repo, except .gitattributes.
+Removed files stay in the repo's commit history.
 
 The write token of the account that owns the repo (jeevan1234) is typed in by the user (hidden input). It is
 never printed, logged or saved.
 
-Usage: python scripts/upload_hf_fair_v2.py /tmp/hf_stage
+Usage: python scripts/upload_hf.py /tmp/hf_stage
 """
 import getpass
 import os
@@ -35,13 +35,12 @@ def main():
     ops = ([CommitOperationAdd(path_in_repo=f, path_or_fileobj=os.path.join(stage, f)) for f in local]
            + [CommitOperationDelete(path_in_repo=f) for f in old])
     info = api.create_commit(repo_id=REPO, repo_type="model", operations=ops,
-                             commit_message="Replace the earlier models with the 18 models of the paper "
-                                            "(corrected view placement, shared training settings)")
+                             commit_message="The 18 trained models of the paper, with code, results and model card")
     print("UPLOAD DONE:", getattr(info, "commit_url", info), flush=True)
     files = HfApi(token=False).list_repo_files(REPO)
-    weights = [f for f in files if f.startswith("fair_v2/") and f.endswith("best_model_weights.pth")]
+    weights = [f for f in files if f.endswith("/best_model_weights.pth")]
     left = [f for f in files if f in old]
-    print(f"Check: {len(weights)} model weight files under fair_v2/ (expected 18); "
+    print(f"Check: {len(weights)} model weight files (expected 18); "
           f"{len(left)} old files left (expected 0); {len(files)} files in the repo.", flush=True)
     return 0
 

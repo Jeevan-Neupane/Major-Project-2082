@@ -5,10 +5,10 @@ Nothing has been uploaded to arXiv.
 ## Files
 | Item | Status |
 |---|---|
-| `arxiv_v2.zip` (source + `anc/`) | **Ready.** Compiles standalone with 0 errors (23 pages). The extra files in `anc/` come from the clean code repository. |
-| `final_paper_v2.pdf` | The compiled paper, for reading. |
+| `arxiv_v3.zip` (source + `anc/`) | **Ready.** Compiles standalone with 0 errors (23 pages). The extra files in `anc/` come from the clean code repository. |
+| `final_paper_v3.pdf` | The compiled paper, for reading. |
 | `arxiv_metadata.txt` | Title, categories, comments and plain-text abstract (1,640 characters; the limit is 1,920). |
-| Major report version | `paper/major_report_version_v2/major_report_paper_v2.pdf` (23 pages). Same as the paper, without the CTPelvic duplicates sentence. |
+| Major report version | `paper/major_report_v3/major_report_paper_v3.pdf` (23 pages). Same as the paper, without the CTPelvic duplicates sentence. |
 
 ## Things only you can do
 1. **[YOU] Upload the 18 models to Hugging Face** (`jeevan1234/biplanar-bone-reconstruction-models`). This needs your HF token (tmux session `hf-upload`).

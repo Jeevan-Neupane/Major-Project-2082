@@ -140,12 +140,12 @@ f.tight_layout(w_pad=0.4)
 save(f, "lifting")
 
 # ---------------------------------------------------------------- our SwinX2S implementation
-# models/swinx2s.py: one SwinTransformer (shared by both views); _inflate_list_to_3d expands
-# each 2D feature map along D with a 1x1x1 Conv3d (initialised to ones), identically for both
-# views; encoder1..encoder10 and decoder1..decoder5 are shared between the views; one TransFusion
-# cross-attention block at the 1/32 bottleneck (models/swinX2S/transfusion.py: LayerNorm +
-# cross-attention, no feed-forward layer, no residual); the two decoded volumes are concatenated
-# and fused by a 1x1x1 Conv3d.  (v2: lateral inflation along W, averaged outputs, instance norm, Tiny only)
+# models/swinx2s.py: one SwinTransformer (Tiny, shared by both views); _inflate_list_to_3d copies
+# the AP feature maps along D and puts the lateral columns on D and copies them along W (1x1x1
+# Conv3d, initialised to ones); encoder1..encoder10 and decoder1..decoder5 (instance norm) are shared
+# between the views; one TransFusion cross-attention block at the 1/32 bottleneck
+# (models/swinX2S/transfusion.py: LayerNorm + cross-attention, no feed-forward layer, no residual);
+# the prediction is the mean of the two decoded volumes.
 f, a = canvas(7.4, 8.3)
 box(a, .3, 7.35, 2.6, .65, "AP image", "", "ap")
 box(a, 4.5, 7.35, 2.6, .65, "Lateral image", "", "lat")

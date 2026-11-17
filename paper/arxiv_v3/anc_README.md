@@ -22,8 +22,8 @@ https://github.com/Jeevan-Neupane/biplanar-bone-reconstruction (release v1.0).
 ## Geometry checks
 - `geometry_check/data_flip_ap.json`: for every sample, whether the loaded AP and lateral images match projections
   of the mask better than their mirror images (AP mirrored on loading, as in training).
-- `geometry_check/models_femur.json`, `models_hip.json`: sensitivity test of how each model places the two views
-  in 3D (random weights, femur and hip sizes). Made by `scripts/check_geometry.py`.
+- `geometry_check/models_<dataset>.json`: sensitivity test of how each model places the two views in 3D (random
+  weights, at the image and grid sizes of that dataset). Made by `scripts/check_geometry.py`.
 
 ## Training logs
 - `logs/<run>.csv` (one row per epoch) and `logs/<run>.log` (settings and progress) for the 18 runs.

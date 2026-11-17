@@ -2,18 +2,18 @@
 """Stage the 18 fair-benchmark models (paper version 2) for upload to the Hugging Face model repo.
 
 Writes a folder that mirrors what will be added to `jeevan1234/biplanar-bone-reconstruction-models`:
-  fair_v2/<model>/<dataset>/best_model_weights.pth   (state dict, copied unchanged)
-  fair_v2/<model>/<dataset>/run_info.json            (config, run, best epoch, settings, val/test summary)
-  fair_v2/code/...                                   (exact code to build and load the models)
-  fair_v2/results_fair.json                          (test statistics of the paper)
+  <model>/<dataset>/best_model_weights.pth   (state dict, copied unchanged)
+  <model>/<dataset>/run_info.json            (config, run, best epoch, settings, val/test summary)
+  code/...                                   (exact code to build and load the models)
+  results_fair.json                          (test statistics of the paper)
   README.md                                          (model card of these models only)
   checkpoint_inventory.json                          (list of the uploaded files)
-The upload (scripts/upload_hf_fair_v2.py) removes the files of the earlier models from the repo. No data are included.
+The upload (scripts/upload_hf.py) removes every other file from the repo. No data are included.
 
 The code, splits, licence notice and statistics are taken from the clean code repository
 (github.com/Jeevan-Neupane/biplanar-bone-reconstruction, --code-root); the weights come from the run folders.
 
-Usage: python scripts/stage_hf_fair_v2.py --stage /tmp/hf_stage --code-root ../biplanar-bone-reconstruction
+Usage: python scripts/stage_hf.py --stage /tmp/hf_stage --code-root ../biplanar-bone-reconstruction
 """
 import argparse
 import json
@@ -69,21 +69,21 @@ Test Dice (%) on the held-out splits, scored once on 17 November 2026:
 {rows}
 
 Layout:
-- `fair_v2/<model>/<dataset>/best_model_weights.pth`: PyTorch state dict of the checkpoint with the best validation Dice.
-- `fair_v2/<model>/<dataset>/run_info.json`: config name, training run, best epoch, settings, validation/test summary.
-- `fair_v2/code/`: the exact code used (configs `fair_<model>_<dataset>`, e.g. `fair_multiscale_hip`).
-- `fair_v2/results_fair.json`: test statistics reported in the paper.
+- `<model>/<dataset>/best_model_weights.pth`: PyTorch state dict of the checkpoint with the best validation Dice.
+- `<model>/<dataset>/run_info.json`: config name, training run, best epoch, settings, validation/test summary.
+- `code/`: the exact code used (configs `fair_<model>_<dataset>`, e.g. `fair_multiscale_hip`).
+- `results_fair.json`: test statistics reported in the paper.
 
 Loading a model (custom architectures, not Transformers AutoModel packages):
 
 ```python
 import sys, torch
-sys.path.insert(0, "fair_v2/code")
+sys.path.insert(0, "code")
 from configs.config import CONFIG_REGISTRY
 from train import create_model
 cfg = CONFIG_REGISTRY["fair_multiscale_hip"]
 model = create_model(cfg, torch.device("cpu"))
-model.load_state_dict(torch.load("fair_v2/multiscale/hip/best_model_weights.pth", map_location="cpu"))
+model.load_state_dict(torch.load("multiscale/hip/best_model_weights.pth", map_location="cpu"))
 model.eval()
 ```
 
@@ -100,7 +100,7 @@ Licences:
 - Training data: TotalSegmentator (CC BY 4.0), VerSe (CC BY-SA 4.0) and CTPelvic1K (CC BY-NC-SA). Models trained on CTPelvic1K
   must not be used commercially.
 - The SwinX2S code is adapted from the official Swin-X2S repository (https://github.com/liukuan5625/Swin-X2S, MIT licence);
-  see `fair_v2/code/THIRD_PARTY_NOTICES.md`.
+  see `code/THIRD_PARTY_NOTICES.md`.
 - No other licence is granted. No dataset files are included.
 """
 
@@ -118,7 +118,7 @@ def main():
     results = json.load(open(os.path.join(ev, "results_fair.json")))
     new_files = []
     for (model, ds), run_dir in RUNS.items():
-        dst = os.path.join(st, "fair_v2", model, ds)
+        dst = os.path.join(st, model, ds)
         os.makedirs(dst)
         shutil.copy2(os.path.join(ROOT, run_dir, "best_model_weights.pth"), os.path.join(dst, "best_model_weights.pth"))
         t = json.load(open(os.path.join(ev, "test", f"fair_{model}_{ds}.json")))
@@ -129,20 +129,20 @@ def main():
                     test_scored_at=t["evaluated_at"],
                     trained_on="NVIDIA L40S (Modal)" if run_dir.startswith("modal_results") else "NVIDIA RTX 5090")
         json.dump(info, open(os.path.join(dst, "run_info.json"), "w"), indent=1)
-        new_files += [f"fair_v2/{model}/{ds}/best_model_weights.pth", f"fair_v2/{model}/{ds}/run_info.json"]
+        new_files += [f"{model}/{ds}/best_model_weights.pth", f"{model}/{ds}/run_info.json"]
     for rel in CODE:
         src = os.path.join(code_root, rel)
         if rel == "scripts/__init__.py" and not os.path.exists(src):
-            os.makedirs(os.path.join(st, "fair_v2", "code", "scripts"), exist_ok=True)
-            open(os.path.join(st, "fair_v2", "code", rel), "w").close()
+            os.makedirs(os.path.join(st, "code", "scripts"), exist_ok=True)
+            open(os.path.join(st, "code", rel), "w").close()
         else:
-            os.makedirs(os.path.dirname(os.path.join(st, "fair_v2", "code", rel)), exist_ok=True)
-            shutil.copy2(src, os.path.join(st, "fair_v2", "code", rel))
-        new_files.append(f"fair_v2/code/{rel}")
-    shutil.copytree(os.path.join(code_root, "splits"), os.path.join(st, "fair_v2", "code", "splits"))
-    new_files += [f"fair_v2/code/splits/{f}" for f in sorted(os.listdir(os.path.join(code_root, "splits")))]
-    shutil.copy2(os.path.join(ev, "results_fair.json"), os.path.join(st, "fair_v2", "results_fair.json"))
-    new_files.append("fair_v2/results_fair.json")
+            os.makedirs(os.path.dirname(os.path.join(st, "code", rel)), exist_ok=True)
+            shutil.copy2(src, os.path.join(st, "code", rel))
+        new_files.append(f"code/{rel}")
+    shutil.copytree(os.path.join(code_root, "splits"), os.path.join(st, "code", "splits"))
+    new_files += [f"code/splits/{f}" for f in sorted(os.listdir(os.path.join(code_root, "splits")))]
+    shutil.copy2(os.path.join(ev, "results_fair.json"), os.path.join(st, "results_fair.json"))
+    new_files.append("results_fair.json")
     open(os.path.join(st, "README.md"), "w").write(model_card(results))
     inv = [{"path": f, "bytes": os.path.getsize(os.path.join(st, f)), "uploaded": True} for f in new_files]
     json.dump(inv, open(os.path.join(st, "checkpoint_inventory.json"), "w"), indent=1)

@@ -22,7 +22,7 @@ Notes:
   * The qualitative figure shows the AP input mirrored, as the models saw it (see render()).
 
 Usage (repository layout):
-  /opt/Major-Project-2082/rootvenv/bin/python paper/arxiv_v2/scripts/make_fair_tables.py
+  /opt/Major-Project-2082/rootvenv/bin/python paper/arxiv_v3/scripts/make_fair_tables.py
 Needs numpy, scipy, matplotlib and Pillow.
 """
 import argparse
@@ -40,7 +40,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-HERE = Path(__file__).resolve().parent                     # paper/arxiv_v2/scripts
+HERE = Path(__file__).resolve().parent                     # paper/arxiv_v3/scripts
 REPO = HERE.parents[2]
 ap = argparse.ArgumentParser()
 ap.add_argument("--evidence", default=str(REPO / "paper" / "evidence_fair"))
@@ -411,7 +411,7 @@ r1 = lambda x: round(100 * x, 1)
 out = {
     "source": {"evidence": str(E.relative_to(ROOT)) if E.is_relative_to(ROOT) else str(E),
                "test_scored_at": json.loads((E / "test" / "test_run_info.json").read_text()).get("test_scored_once_at"),
-               "script": "paper/arxiv_v2/scripts/make_fair_tables.py"},
+               "script": "paper/arxiv_v3/scripts/make_fair_tables.py"},
     "n_test_cases_total": sum(S[ds, "multiscale"]["n"] for ds in DATASETS),
     "n_test_cases": {ds: S[ds, "multiscale"]["n"] for ds in DATASETS},
     "test_dice_pct": {ds: {m: {"mean": r1(S[ds, m]["dice"]), "sd": r1(S[ds, m]["dice_sd"]),

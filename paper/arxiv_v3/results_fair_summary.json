@@ -2,7 +2,7 @@
  "source": {
   "evidence": "paper/evidence_fair",
   "test_scored_at": "2026-11-17 06:56:04 UTC",
-  "script": "paper/arxiv_v2/scripts/make_fair_tables.py"
+  "script": "paper/arxiv_v3/scripts/make_fair_tables.py"
  },
  "n_test_cases_total": 297,
  "n_test_cases": {

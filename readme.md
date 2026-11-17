@@ -23,28 +23,13 @@ python train.py --config swinx2s_femur
 Use `--dry_run --no_wandb --num_workers 0` to verify a configuration without
 starting an experiment.
 
-## Fair benchmark (paper version 2, November 2026)
+## Paper (November 2026)
 
-The results in `paper/arxiv_v2/` come from the configs `fair_<model>_<dataset>`, for example
-`fair_multiscale_hip` or `fair_swinx2s_femur`. Compared with the older configs, they add:
-
-- AP images mirrored on loading (`FLIP_AP_LR`);
-- both views placed in 3D according to the X-ray geometry (`VIEW_GEOMETRY="correct"`);
-- standard Swin windows with drop path, averaging of the two SwinX2S outputs and the official two-view loss;
-- GroupNorm (DualViewCNN) and InstanceNorm (SwinX2S);
-- the same settings for every model: 200 epochs, batch size 2, early stopping after 40 epochs;
-- the deduplicated CTPelvic split (`splits/ctpelvic_seed42_dedup.json`).
-
-```bash
-python train.py --config fair_multiscale_hip --no_wandb
-python scripts/check_geometry.py --part models          # how each model places the two views in 3D
-python scripts/check_geometry.py --part data --flip-ap  # do the images match projections of the masks?
-python scripts/evaluate_fair.py --split val             # validation check (test: once, after this passes)
-python scripts/analyze_fair.py                          # paired statistics
-```
-
-The old configs (without `fair_`) and their default options reproduce the first version exactly.
-Trained models are on Hugging Face: `jeevan1234/biplanar-bone-reconstruction-models` (folder `fair_v2/`).
+The paper is in `paper/arxiv_v3/` (`final_paper_v3.pdf`, arXiv package `arxiv_v3.zip`); the version for the major
+project report is in `paper/major_report_v3/`. Its code, data splits and per-case results are in the repository
+https://github.com/Jeevan-Neupane/biplanar-bone-reconstruction (release v1.0), with the configs
+`fair_<model>_<dataset>`, for example `fair_multiscale_hip`. Trained models are on Hugging Face:
+`jeevan1234/biplanar-bone-reconstruction-models`.
 
 ## Data protocol
 
