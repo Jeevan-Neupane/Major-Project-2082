@@ -48,7 +48,6 @@ Getting a 3D shape back from two projections is an ill-posed problem, because ma
 In this paper we compare three models that we trained and tested with the same pipeline on six datasets from three public CT collections. The work started as an undergraduate project. The paper gives:
 \begin{itemize}
 \item test results for 18 models (three models on six datasets) trained under one protocol, with the same epoch limit, batch size and early stopping and with both views placed in 3D according to the X-ray geometry, tested once on held-out data, with per-case overlap and surface-distance scores and paired statistical tests;
-\item a simple projection test and a sensitivity test that check how a model places the two views in 3D;
 \item the trained models, per-case test results, training logs and the scripts that make every table and figure.
 \end{itemize}
 
@@ -328,9 +327,6 @@ MultiScale has 3.73 million parameters, 8.7 times fewer than SwinX2S (32.5 milli
 \subsection{What the results show}
 With both views placed according to the X-ray geometry and with the same epoch limit, batch size and early stopping, the same model came first on all six datasets. The gap between MultiScale and SwinX2S is small on femur, the vertebrae and hip (0.9 to 2.7 points) and larger on CTPelvic (4.1) and rib (11.0). DualViewCNN is close on femur but far behind on the vertebrae. These are results for three specific implementations trained once with the settings in Table~\ref{tab:training}. The rest of this section discusses possible reasons. We did not test any of them with a controlled experiment.
 
-\subsection{How the views are placed in 3D}
-Mistakes in how the two views are placed in 3D are easy to make, because the AP and lateral images are usually resized to the same shape, so a wrong placement still gives tensors of the right size and the network still trains to a reasonable Dice. A sensitivity test like the one in Section~\ref{sec:models}, together with a projection test on the data (Section~\ref{sec:problem}), checks this quickly, and we recommend running both before comparing models.
-
 \subsection{Model size, amount of data and training}
 SwinX2S has 8.7 times more parameters than MultiScale but was trained on only 85 to 747 samples, from scratch, without the pretrained weights that Swin models usually start from~\cite{swin2021}. Transformers usually need large training sets or pretraining to match CNNs~\cite{dosovitskiy2021}. The cross-view block has no residual connection (as in the official code), so the bottleneck features of each view are replaced by features taken from the other view. We also kept each model's own optimizer and learning rate without tuning them, so a model whose default setting suits our data less well is at a disadvantage. A comparison with tuned learning rates, several seeds, pretrained weights and larger training sets would show whether the remaining gap between MultiScale and SwinX2S comes from the architecture.
 
@@ -367,7 +363,7 @@ These experiments would address the limitations above:
 
 % ======================================================================
 \section{Conclusion}
-We trained and tested three models that reconstruct bone masks from two simulated X-ray images, on six datasets with one pipeline, with both views placed according to the X-ray geometry and the same training budget. A multi-scale network that copies the features of both views into the volume at four resolutions had the highest Dice and the lowest surface errors on every dataset, with far fewer parameters than the transformer model, which came second on five datasets. Checks of how the views are placed in 3D should be part of any comparison of this kind. The rib cage stayed hard for all models. Tests on real X-ray images, splits by subject and direct measurement of clinical values are needed before any clinical use can be considered.
+We trained and tested three models that reconstruct bone masks from two simulated X-ray images, on six datasets with one pipeline, with both views placed according to the X-ray geometry and the same training budget. A multi-scale network that copies the features of both views into the volume at four resolutions had the highest Dice and the lowest surface errors on every dataset, with far fewer parameters than the transformer model, which came second on five datasets. The rib cage stayed hard for all models. Tests on real X-ray images, splits by subject and direct measurement of clinical values are needed before any clinical use can be considered.
 
 % ======================================================================
 \section*{Code and Data Availability}
