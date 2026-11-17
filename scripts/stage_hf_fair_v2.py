@@ -6,11 +6,11 @@ Writes a folder that mirrors what will be added to `jeevan1234/biplanar-bone-rec
   fair_v2/<model>/<dataset>/run_info.json            (config, run, best epoch, settings, val/test summary)
   fair_v2/code/...                                   (exact code to build and load the models)
   fair_v2/results_fair.json                          (test statistics of the paper)
-  README.md                                          (updated model card: v2 first, v1 kept and marked)
-  checkpoint_inventory.json                          (old entries + new files)
-Old files in the repo (saved_models/, models/, configs/ of version 1) are not touched. No data are included.
+  README.md                                          (model card of these models only)
+  checkpoint_inventory.json                          (list of the uploaded files)
+The upload (scripts/upload_hf_fair_v2.py) removes the files of the earlier models from the repo. No data are included.
 
-Usage: python scripts/stage_hf_fair_v2.py --stage /tmp/hf_stage --current /tmp/hf_current
+Usage: python scripts/stage_hf_fair_v2.py --stage /tmp/hf_stage
 """
 import argparse
 import json
@@ -33,13 +33,11 @@ CODE = ["train.py", "requirements.txt", "configs/__init__.py", "configs/config.p
 LABEL = {"femur": "Femur", "hip": "Hip", "rib": "Rib", "verse19": "VerSe19", "verse20": "VerSe20", "ctpelvic": "CTPelvic"}
 
 
-def model_card(old_card, results):
+def model_card(results):
     s = results["summary"]
     rows = "\n".join(
         f"| {LABEL[ds]} | {s[f'dualviewcnn/{ds}']['n']} | " + " | ".join(
             f"{100 * s[f'{m}/{ds}']['dice']:.1f}" for m in MODELS) + " |" for ds in DATASETS)
-    old_body = old_card.split("---", 2)[2].strip()
-    old_body = old_body.replace("# Biplanar bone reconstruction models", "").strip()
     return f"""---
 library_name: pytorch
 tags:
@@ -49,16 +47,17 @@ tags:
 ---
 # Biplanar bone reconstruction models
 
-## Version 2 (current, 17 November 2026): `fair_v2/`
-
-The 18 models (DualViewCNN, MultiScale and SwinX2S on femur, hip, rib, VerSe19, VerSe20 and CTPelvic) of version 2 of the paper
+The 18 trained models (DualViewCNN, MultiScale and SwinX2S on femur, hip, rib, VerSe19, VerSe20 and CTPelvic) of the paper
 "Reconstructing 3D Bone Shapes from Biplanar X-rays: Three Deep Learning Models Tested on Six Datasets".
 
-What changed from version 1:
+Code, data splits and per-case results: https://github.com/Jeevan-Neupane/biplanar-bone-reconstruction (release v1.0).
+
+How they were trained:
 - Both X-ray views are placed in 3D according to the X-ray geometry, and the AP image is mirrored on loading.
-- All models share the same training settings: 200 epochs, batch size 2, early stopping after 40 epochs.
-- SwinX2S (Tiny) uses standard Swin windows with drop path and the official averaging of its two outputs.
-- The CTPelvic split has no duplicated scans.
+- All models share the same training settings: up to 200 epochs, batch size 2, early stopping after 40 epochs without a
+  better validation Dice, and the checkpoint with the best validation Dice.
+- SwinX2S (Tiny) is adapted from the official Swin-X2S code and uses its averaging of the two outputs.
+- The CTPelvic split keeps one copy of each scan.
 
 Test Dice (%) on the held-out splits, scored once on 17 November 2026:
 
@@ -92,7 +91,7 @@ Limitations:
 - Trained and tested only on simulated X-ray images (DRRs) from public CT datasets.
 - Not clinically validated.
 - Splits are by sample, so vertebrae or femurs from the same scan can fall into different splits.
-- The test splits were also scored once for version 1.
+- Each model was trained once (one seed). The test splits had been scored once before, for an earlier version of these models.
 
 Licences:
 - Training data: TotalSegmentator (CC BY 4.0), VerSe (CC BY-SA 4.0) and CTPelvic1K (CC BY-NC-SA). Models trained on CTPelvic1K
@@ -100,25 +99,12 @@ Licences:
 - The SwinX2S code is adapted from the official Swin-X2S repository (https://github.com/liukuan5625/Swin-X2S, MIT licence);
   see `fair_v2/code/THIRD_PARTY_NOTICES.md`.
 - No other licence is granted. No dataset files are included.
-
-## Version 1 (earlier, superseded): `saved_models/`, `models/`, `configs/`
-
-These are the models of version 1 of the paper. They are kept unchanged for the record. They contain the errors that
-version 2 corrects:
-- the AP view is mirrored relative to the volume;
-- DualViewCNN and SwinX2S place the lateral view on the wrong axis;
-- the vendored Swin code splits the attention windows incorrectly and never applies drop path.
-
-Use `fair_v2/` for new work. The original description of version 1 follows.
-
-{old_body}
 """
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stage", required=True)
-    ap.add_argument("--current", required=True, help="folder with the repo's current README.md and inventory")
     args = ap.parse_args()
     st = args.stage
     shutil.rmtree(st, ignore_errors=True)
@@ -157,10 +143,8 @@ def main():
     new_files.append("fair_v2/code/THIRD_PARTY_NOTICES.md")
     shutil.copy2(os.path.join(ev, "results_fair.json"), os.path.join(st, "fair_v2", "results_fair.json"))
     new_files.append("fair_v2/results_fair.json")
-    open(os.path.join(st, "README.md"), "w").write(
-        model_card(open(os.path.join(args.current, "README.md")).read(), results))
-    inv = json.load(open(os.path.join(args.current, "checkpoint_inventory.json")))
-    inv += [{"path": f, "bytes": os.path.getsize(os.path.join(st, f)), "uploaded": True} for f in new_files]
+    open(os.path.join(st, "README.md"), "w").write(model_card(results))
+    inv = [{"path": f, "bytes": os.path.getsize(os.path.join(st, f)), "uploaded": True} for f in new_files]
     json.dump(inv, open(os.path.join(st, "checkpoint_inventory.json"), "w"), indent=1)
     total = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(st) for f in fs)
     print(f"staged {len(new_files)} new files + README + inventory in {st} ({total / 1e9:.2f} GB)")
