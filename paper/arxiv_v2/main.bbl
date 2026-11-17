@@ -1,0 +1,364 @@
+\begin{thebibliography}{41}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Brenner and Hall(2007)]{brenner2007}
+David~J. Brenner and Eric~J. Hall.
+\newblock Computed tomography --- an increasing source of radiation exposure.
+\newblock \emph{New England Journal of Medicine}, 357\penalty0 (22):\penalty0
+  2277--2284, 2007.
+\newblock \doi{10.1056/NEJMra072149}.
+
+\bibitem[Dubousset et~al.(2005)Dubousset, Charpak, Dorion, Skalli, Lavaste,
+  de~Guise, Kalifa, and Ferey]{dubousset2005}
+Jean Dubousset, Georges Charpak, Ir{\`e}ne Dorion, Wafa Skalli, Fran{\c{c}}ois
+  Lavaste, Jacques de~Guise, Gabriel Kalifa, and Sol{\`e}ne Ferey.
+\newblock Une nouvelle imagerie ost{\'e}o-articulaire basse dose en position
+  debout : le syst{\`e}me {EOS}.
+\newblock \emph{Bulletin de l'Acad{\'e}mie Nationale de M{\'e}decine},
+  189\penalty0 (2):\penalty0 287--300, 2005.
+\newblock \doi{10.1016/S0001-4079(19)33584-8}.
+\newblock In French.
+
+\bibitem[Humbert et~al.(2009)Humbert, de~Guise, Aubert, Godbout, and
+  Skalli]{humbert2009}
+L.~Humbert, J.~A. de~Guise, B.~Aubert, B.~Godbout, and W.~Skalli.
+\newblock {3D} reconstruction of the spine from biplanar {X}-rays using
+  parametric models based on transversal and longitudinal inferences.
+\newblock \emph{Medical Engineering \& Physics}, 31\penalty0 (6):\penalty0
+  681--687, 2009.
+\newblock \doi{10.1016/j.medengphy.2009.01.003}.
+
+\bibitem[Melhem et~al.(2016)Melhem, Assi, Rachkidi, and Ghanem]{melhem2016}
+Elias Melhem, Ayman Assi, Rami~El Rachkidi, and Ismat Ghanem.
+\newblock {EOS} biplanar {X}-ray imaging: Concept, developments, benefits, and
+  limitations.
+\newblock \emph{Journal of Children's Orthopaedics}, 10\penalty0 (1):\penalty0
+  1--14, 2016.
+\newblock \doi{10.1007/s11832-016-0713-0}.
+
+\bibitem[Laporte et~al.(2003)Laporte, Skalli, de~Guise, Lavaste, and
+  Mitton]{laporte2003}
+S.~Laporte, W.~Skalli, J.~A. de~Guise, F.~Lavaste, and D.~Mitton.
+\newblock A biplanar reconstruction method based on {2D} and {3D} contours:
+  Application to the distal femur.
+\newblock \emph{Computer Methods in Biomechanics and Biomedical Engineering},
+  6\penalty0 (1):\penalty0 1--6, 2003.
+\newblock \doi{10.1080/1025584031000065956}.
+
+\bibitem[Zheng et~al.(2009)Zheng, Gollmer, Schumann, Dong, Feilkas, and
+  Ballester]{zheng2009}
+Guoyan Zheng, Sebastian Gollmer, Steffen Schumann, Xiao Dong, Thomas Feilkas,
+  and Miguel A.~Gonz{\'a}lez Ballester.
+\newblock A {2D/3D} correspondence building method for reconstruction of a
+  patient-specific {3D} bone surface model using point distribution models and
+  calibrated {X}-ray images.
+\newblock \emph{Medical Image Analysis}, 13\penalty0 (6):\penalty0 883--899,
+  2009.
+\newblock \doi{10.1016/j.media.2008.12.003}.
+
+\bibitem[Baka et~al.(2011)Baka, Kaptein, de~Bruijne, van Walsum, Giphart,
+  Niessen, and Lelieveldt]{baka2011}
+N.~Baka, B.~L. Kaptein, M.~de~Bruijne, T.~van Walsum, J.~E. Giphart, W.~J.
+  Niessen, and B.~P.~F. Lelieveldt.
+\newblock {2D}--{3D} shape reconstruction of the distal femur from stereo
+  {X}-ray imaging using statistical shape models.
+\newblock \emph{Medical Image Analysis}, 15\penalty0 (6):\penalty0 840--850,
+  2011.
+\newblock \doi{10.1016/j.media.2011.04.001}.
+
+\bibitem[Karade and Ravi(2015)]{karade2015}
+Vikas Karade and Bhallamudi Ravi.
+\newblock {3D} femur model reconstruction from biplane {X}-ray images: A novel
+  method based on {L}aplacian surface deformation.
+\newblock \emph{International Journal of Computer Assisted Radiology and
+  Surgery}, 10\penalty0 (4):\penalty0 473--485, 2015.
+\newblock \doi{10.1007/s11548-014-1097-6}.
+
+\bibitem[Ying et~al.(2019)Ying, Guo, Ma, Wu, Weng, and Zheng]{ying2019}
+Xingde Ying, Heng Guo, Kai Ma, Jian Wu, Zhengxin Weng, and Yefeng Zheng.
+\newblock {X2CT-GAN}: Reconstructing {CT} from biplanar x-rays with generative
+  adversarial networks.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision
+  and Pattern Recognition (CVPR)}, pages 10611--10620, 2019.
+\newblock \doi{10.1109/CVPR.2019.01087}.
+\newblock URL \url{https://arxiv.org/abs/1905.06902}.
+
+\bibitem[Kasten et~al.(2020)Kasten, Doktofsky, and Kovler]{kasten2020}
+Yoni Kasten, Daniel Doktofsky, and Ilya Kovler.
+\newblock End-to-end convolutional neural network for {3D} reconstruction of
+  knee bones from bi-planar {X}-ray images.
+\newblock In \emph{Machine Learning for Medical Image Reconstruction (MLMIR
+  2020)}, volume 12450 of \emph{LNCS}, pages 123--133, 2020.
+\newblock \doi{10.1007/978-3-030-61598-7_12}.
+\newblock URL \url{https://arxiv.org/abs/2004.00871}.
+
+\bibitem[Bayat et~al.(2020)Bayat, Sekuboyina, Paetzold, Payer, {\v{S}}tern,
+  Urschler, Kirschke, and Menze]{bayat2020}
+Amirhossein Bayat, Anjany Sekuboyina, Johannes~C. Paetzold, Christian Payer,
+  Darko {\v{S}}tern, Martin Urschler, Jan~S. Kirschke, and Bjoern~H. Menze.
+\newblock Inferring the {3D} standing spine posture from {2D} radiographs.
+\newblock In \emph{Medical Image Computing and Computer Assisted Intervention
+  (MICCAI)}, volume 12266 of \emph{LNCS}, pages 775--784, 2020.
+\newblock \doi{10.1007/978-3-030-59725-2_75}.
+\newblock URL \url{https://arxiv.org/abs/2007.06612}.
+
+\bibitem[Shakya and Khanal(2023)]{shakya2023}
+Mahesh Shakya and Bishesh Khanal.
+\newblock Benchmarking encoder-decoder architectures for biplanar x-ray to 3d
+  bone shape reconstruction.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~36, pages 20469--20481, 2023.
+\newblock \doi{10.52202/075280-0899}.
+\newblock URL
+  \url{https://proceedings.neurips.cc/paper_files/paper/2023/hash/412732f172bdd5ad0efde2fafa110700-Abstract-Datasets_and_Benchmarks.html}.
+
+\bibitem[Liu et~al.(2025)Liu, Ying, Jin, Li, Huang, Wu, Chen, Qi, Lu, Deng, and
+  Chen]{liuk2025}
+Kuan Liu, Zongyuan Ying, Jie Jin, Dongyan Li, Ping Huang, Wenjian Wu, Zhe Chen,
+  Jin Qi, Yong Lu, Lianfu Deng, and Bo~Chen.
+\newblock {Swin-X2S}: Reconstructing 3d shape from 2d biplanar x-ray with swin
+  transformers.
+\newblock \emph{arXiv preprint arXiv:2501.05961}, 2025.
+\newblock URL \url{https://arxiv.org/abs/2501.05961}.
+
+\bibitem[Zhang et~al.(2010)Zhang, Sun, Sun, Chi, and Xi]{zhang2010}
+Bin Zhang, Shaobin Sun, Jinwei Sun, Zhiyong Chi, and Chunyang Xi.
+\newblock {3D} reconstruction method from biplanar radiography using {DLT}
+  algorithm: Application to the femur.
+\newblock In \emph{2010 First International Conference on Pervasive Computing,
+  Signal Processing and Applications (PCSPA)}, pages 251--254, 2010.
+\newblock \doi{10.1109/PCSPA.2010.68}.
+
+\bibitem[Gunay et~al.(2007)Gunay, Shim, and Shimada]{gunay2007}
+Murat Gunay, Mun-Bo Shim, and Kenji Shimada.
+\newblock Cost- and time-effective three-dimensional bone-shape reconstruction
+  from {X}-ray images.
+\newblock \emph{The International Journal of Medical Robotics and Computer
+  Assisted Surgery}, 3\penalty0 (4):\penalty0 323--335, 2007.
+\newblock \doi{10.1002/rcs.162}.
+
+\bibitem[Heimann and Meinzer(2009)]{heimann2009}
+Tobias Heimann and Hans-Peter Meinzer.
+\newblock Statistical shape models for {3D} medical image segmentation: A
+  review.
+\newblock \emph{Medical Image Analysis}, 13\penalty0 (4):\penalty0 543--563,
+  2009.
+\newblock \doi{10.1016/j.media.2009.05.004}.
+
+\bibitem[Henzler et~al.(2018)Henzler, Rasche, Ropinski, and
+  Ritschel]{henzler2018}
+Philipp Henzler, Volker Rasche, Timo Ropinski, and Tobias Ritschel.
+\newblock Single-image tomography: {3D} volumes from {2D} cranial {X}-rays.
+\newblock \emph{Computer Graphics Forum}, 37\penalty0 (2):\penalty0 377--388,
+  2018.
+\newblock \doi{10.1111/cgf.13369}.
+
+\bibitem[Shen et~al.(2019)Shen, Zhao, and Xing]{shen2019}
+Liyue Shen, Wei Zhao, and Lei Xing.
+\newblock Patient-specific reconstruction of volumetric computed tomography
+  images from a single projection view via deep learning.
+\newblock \emph{Nature Biomedical Engineering}, 3\penalty0 (11):\penalty0
+  880--888, 2019.
+\newblock \doi{10.1038/s41551-019-0466-4}.
+
+\bibitem[Gu et~al.(2024)Gu, Otake, Uemura, Takao, Soufi, Okada, Sugano, Talbot,
+  and Sato]{gu2024}
+Yi~Gu, Yoshito Otake, Keisuke Uemura, Masaki Takao, Mazen Soufi, Seiji Okada,
+  Nobuhiko Sugano, Hugues Talbot, and Yoshinobu Sato.
+\newblock {3DDX}: Bone surface reconstruction from a single standard-geometry
+  radiograph via dual-face depth estimation.
+\newblock In \emph{Medical Image Computing and Computer Assisted Intervention
+  (MICCAI)}, volume 15007 of \emph{LNCS}, pages 3--13, 2024.
+\newblock \doi{10.1007/978-3-031-72104-5_1}.
+\newblock arXiv:2409.16702.
+
+\bibitem[Shiode et~al.(2021)Shiode, Kabashima, Hiasa, Oka, Murase, Sato, and
+  Otake]{shiode2021}
+Ryoya Shiode, Mototaka Kabashima, Yuta Hiasa, Kunihiro Oka, Tsuyoshi Murase,
+  Yoshinobu Sato, and Yoshito Otake.
+\newblock {2D}--{3D} reconstruction of distal forearm bone from actual {X}-ray
+  images of the wrist using convolutional neural networks.
+\newblock \emph{Scientific Reports}, 11:\penalty0 15249, 2021.
+\newblock \doi{10.1038/s41598-021-94634-2}.
+
+\bibitem[Liu et~al.(2021{\natexlab{a}})Liu, Lin, Cao, Hu, Wei, Zhang, Lin, and
+  Guo]{swin2021}
+Ze~Liu, Yutong Lin, Yue Cao, Han Hu, Yixuan Wei, Zheng Zhang, Stephen Lin, and
+  Baining Guo.
+\newblock Swin transformer: Hierarchical vision transformer using shifted
+  windows.
+\newblock In \emph{Proceedings of the IEEE/CVF International Conference on
+  Computer Vision (ICCV)}, pages 10012--10022, 2021{\natexlab{a}}.
+\newblock URL \url{https://arxiv.org/abs/2103.14030}.
+
+\bibitem[Cai et~al.(2024)Cai, Wang, Yuille, Zhou, and Wang]{cai2024}
+Yuanhao Cai, Jiahao Wang, Alan Yuille, Zongwei Zhou, and Angtian Wang.
+\newblock Structure-aware sparse-view {X}-ray {3D} reconstruction.
+\newblock In \emph{Proceedings of the IEEE/CVF Conference on Computer Vision
+  and Pattern Recognition (CVPR)}, pages 11174--11183, 2024.
+\newblock \doi{10.1109/CVPR52733.2024.01062}.
+
+\bibitem[Wang et~al.(2025)Wang, Tao, Wu, Wang, Duan, Wang, Yang, and
+  Yan]{wang2025xfield}
+Feiran Wang, Jiachen Tao, Junyi Wu, Haoxuan Wang, Bin Duan, Kai Wang, Zongxin
+  Yang, and Yan Yan.
+\newblock {X-Field}: A physically informed representation for {3D} {X}-ray
+  reconstruction.
+\newblock In \emph{Advances in Neural Information Processing Systems},
+  volume~38, pages 167214--167239, 2025.
+\newblock \doi{10.52202/085713-5036}.
+\newblock arXiv:2503.08596.
+
+\bibitem[Siddon(1985)]{siddon1985}
+Robert~L. Siddon.
+\newblock Fast calculation of the exact radiological path for a
+  three-dimensional {CT} array.
+\newblock \emph{Medical Physics}, 12\penalty0 (2):\penalty0 252--255, 1985.
+\newblock \doi{10.1118/1.595715}.
+
+\bibitem[Ehlke et~al.(2013)Ehlke, Ramm, Lamecker, Hege, and Zachow]{ehlke2013}
+Moritz Ehlke, Heiko Ramm, Hans Lamecker, Hans-Christian Hege, and Stefan
+  Zachow.
+\newblock Fast generation of virtual {X}-ray images for reconstruction of {3D}
+  anatomy.
+\newblock \emph{IEEE Transactions on Visualization and Computer Graphics},
+  19\penalty0 (12):\penalty0 2673--2682, 2013.
+\newblock \doi{10.1109/TVCG.2013.159}.
+
+\bibitem[Wasserthal et~al.(2023)Wasserthal, Breit, Meyer, Pradella, Hinck,
+  Sauter, Heye, Boll, Cyriac, Yang, Bach, and Segeroth]{wasserthal2023}
+Jakob Wasserthal, Hanns-Christian Breit, Manfred~T. Meyer, Maurice Pradella,
+  Daniel Hinck, Alexander~W. Sauter, Tobias Heye, Daniel~T. Boll, Joshy Cyriac,
+  Shan Yang, Michael Bach, and Martin Segeroth.
+\newblock {TotalSegmentator}: Robust segmentation of 104 anatomic structures in
+  {CT} images.
+\newblock \emph{Radiology: Artificial Intelligence}, 5\penalty0 (5):\penalty0
+  e230024, 2023.
+\newblock \doi{10.1148/ryai.230024}.
+\newblock URL \url{https://arxiv.org/abs/2208.05868}.
+
+\bibitem[Sekuboyina et~al.(2021)Sekuboyina, Husseini, Bayat, L{\"o}ffler,
+  Liebl, Li, et~al.]{verse2021}
+Anjany Sekuboyina, Malek~E. Husseini, Amirhossein Bayat, Maximilian
+  L{\"o}ffler, Hans Liebl, Hongwei Li, et~al.
+\newblock {VerSe}: A vertebrae labelling and segmentation benchmark for
+  multi-detector {CT} images.
+\newblock \emph{Medical Image Analysis}, 73:\penalty0 102166, 2021.
+\newblock \doi{10.1016/j.media.2021.102166}.
+\newblock URL \url{https://arxiv.org/abs/2001.09193}.
+
+\bibitem[Liu et~al.(2021{\natexlab{b}})Liu, Han, Du, Zhu, Li, Gu, Xiao, Li,
+  Zhao, Xiao, Wu, and Zhou]{pelvic2020}
+Pengbo Liu, Hu~Han, Yuanqi Du, Heqin Zhu, Yinhao Li, Feng Gu, Honghu Xiao, Jun
+  Li, Chunpeng Zhao, Li~Xiao, Xinbao Wu, and S.~Kevin Zhou.
+\newblock Deep learning to segment pelvic bones: Large-scale {CT} datasets and
+  baseline models.
+\newblock \emph{International Journal of Computer Assisted Radiology and
+  Surgery}, 16\penalty0 (5):\penalty0 749--756, 2021{\natexlab{b}}.
+\newblock \doi{10.1007/s11548-021-02363-8}.
+\newblock URL \url{https://arxiv.org/abs/2012.08721}.
+
+\bibitem[Taha and Hanbury(2015)]{taha2015}
+Abdel~Aziz Taha and Allan Hanbury.
+\newblock Metrics for evaluating {3D} medical image segmentation: Analysis,
+  selection, and tool.
+\newblock \emph{BMC Medical Imaging}, 15:\penalty0 29, 2015.
+\newblock \doi{10.1186/s12880-015-0068-x}.
+
+\bibitem[Maier-Hein et~al.(2024)Maier-Hein, Reinke, et~al.]{maierhein2024}
+Lena Maier-Hein, Annika Reinke, et~al.
+\newblock Metrics reloaded: Recommendations for image analysis validation.
+\newblock \emph{Nature Methods}, 21\penalty0 (2):\penalty0 195--212, 2024.
+\newblock \doi{10.1038/s41592-023-02151-z}.
+
+\bibitem[Nikolov et~al.(2021)Nikolov, Blackwell, et~al.]{nikolov2021}
+Stanislav Nikolov, Sam Blackwell, et~al.
+\newblock Clinically applicable segmentation of head and neck anatomy for
+  radiotherapy: Deep learning algorithm development and validation study.
+\newblock \emph{Journal of Medical Internet Research}, 23\penalty0
+  (7):\penalty0 e26151, 2021.
+\newblock \doi{10.2196/26151}.
+
+\bibitem[{Nepal Applied Mathematics and Informatics Institute for Research
+  (NAAMII)}(2022)]{xrayto3dpreprocess}
+{Nepal Applied Mathematics and Informatics Institute for Research (NAAMII)}.
+\newblock {XrayTo3DPreprocess}.
+\newblock GitHub repository,
+  \url{https://github.com/naamiinepal/XrayTo3DPreprocess}, 2022.
+\newblock Repository created December 2022; accessed November 2026.
+
+\bibitem[Wu and He(2018)]{wu2018}
+Yuxin Wu and Kaiming He.
+\newblock Group normalization.
+\newblock In \emph{Proceedings of the European Conference on Computer Vision
+  (ECCV)}, volume 11217 of \emph{LNCS}, pages 3--19, 2018.
+\newblock \doi{10.1007/978-3-030-01261-8_1}.
+
+\bibitem[He et~al.(2016)He, Zhang, Ren, and Sun]{he2016}
+Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun.
+\newblock Deep residual learning for image recognition.
+\newblock In \emph{Proceedings of the IEEE Conference on Computer Vision and
+  Pattern Recognition (CVPR)}, pages 770--778, 2016.
+\newblock \doi{10.1109/CVPR.2016.90}.
+
+\bibitem[Ronneberger et~al.(2015)Ronneberger, Fischer, and
+  Brox]{ronneberger2015}
+Olaf Ronneberger, Philipp Fischer, and Thomas Brox.
+\newblock {U-Net}: Convolutional networks for biomedical image segmentation.
+\newblock In \emph{Medical Image Computing and Computer-Assisted Intervention
+  (MICCAI)}, volume 9351 of \emph{LNCS}, pages 234--241, 2015.
+\newblock \doi{10.1007/978-3-319-24574-4_28}.
+
+\bibitem[Milletari et~al.(2016)Milletari, Navab, and Ahmadi]{milletari2016}
+Fausto Milletari, Nassir Navab, and Seyed-Ahmad Ahmadi.
+\newblock {V-Net}: Fully convolutional neural networks for volumetric medical
+  image segmentation.
+\newblock In \emph{Fourth International Conference on 3D Vision (3DV)}, pages
+  565--571, 2016.
+\newblock \doi{10.1109/3DV.2016.79}.
+
+\bibitem[Micikevicius et~al.(2018)Micikevicius, Narang, Alben, Diamos, Elsen,
+  Garcia, Ginsburg, Houston, Kuchaiev, Venkatesh, and Wu]{micikevicius2018}
+Paulius Micikevicius, Sharan Narang, Jonah Alben, Gregory Diamos, Erich Elsen,
+  David Garcia, Boris Ginsburg, Michael Houston, Oleksii Kuchaiev, Ganesh
+  Venkatesh, and Hao Wu.
+\newblock Mixed precision training.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2018.
+
+\bibitem[Wilcoxon(1945)]{wilcoxon1945}
+Frank Wilcoxon.
+\newblock Individual comparisons by ranking methods.
+\newblock \emph{Biometrics Bulletin}, 1\penalty0 (6):\penalty0 80--83, 1945.
+\newblock \doi{10.2307/3001968}.
+
+\bibitem[Holm(1979)]{holm1979}
+Sture Holm.
+\newblock A simple sequentially rejective multiple test procedure.
+\newblock \emph{Scandinavian Journal of Statistics}, 6\penalty0 (2):\penalty0
+  65--70, 1979.
+
+\bibitem[Dosovitskiy et~al.(2021)Dosovitskiy, Beyer, Kolesnikov, Weissenborn,
+  Zhai, Unterthiner, Dehghani, Minderer, Heigold, Gelly, Uszkoreit, and
+  Houlsby]{dosovitskiy2021}
+Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weissenborn,
+  Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani, Matthias Minderer, Georg
+  Heigold, Sylvain Gelly, Jakob Uszkoreit, and Neil Houlsby.
+\newblock An image is worth 16x16 words: Transformers for image recognition at
+  scale.
+\newblock In \emph{International Conference on Learning Representations
+  (ICLR)}, 2021.
+
+\bibitem[Habert(2017)]{habert2017drr}
+S{\'e}verine Habert.
+\newblock {DRR-renderer}: Simple code to generate digitally reconstructed
+  radiographs from {MetaImage} ({.mhd}) {CT} data.
+\newblock GitHub repository,
+  \url{https://github.com/SeverineHabert/DRR-renderer}, 2017.
+\newblock MIT License.
+
+\end{thebibliography}

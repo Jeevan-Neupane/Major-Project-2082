@@ -1,5 +1,5 @@
 """
-TransVert: CNN-based 3D Bone Reconstruction from Two Orthogonal X-ray Views.
+DualViewCNN: CNN-based 3D bone reconstruction from two orthogonal X-ray views.
 
 Architecture (matching the paper diagram):
   1. Two shared-architecture encoders each produce a thin 3D feature slab
@@ -182,12 +182,12 @@ class Volume3DDecoder(nn.Module):
 
 
 # ---------------------------
-# TransVert Main Model
+# Dual-view CNN main model
 # ---------------------------
 
-class TransVert(nn.Module):
+class DualViewCNN(nn.Module):
     """
-    TransVert: 3D bone reconstruction from two orthogonal X-ray views.
+    A general-purpose dual-view CNN baseline for 3D bone segmentation.
 
     Key insight from the paper diagram:
         The two views are expanded along **orthogonal** spatial axes
@@ -219,13 +219,34 @@ class TransVert(nn.Module):
         mid_channels=32,
         out_channels=1,
         intermediate_depth=16,
+        geometry="legacy",
+        input_width=None,
+        norm="batch",
     ):
+        """
+        Extra options (defaults reproduce the November 2026 models exactly):
+            geometry: ``"legacy"`` places the lateral view like the AP view
+                (image columns on the volume's W axis, copies along D), which
+                is geometrically wrong.  ``"correct"`` puts the lateral image
+                columns (anterior-posterior) on D and copies along W, the
+                direction of the lateral X-rays.  Volume axes are (D, H, W) =
+                (anterior-posterior, superior-inferior, left-right).
+            input_width: width W of the 2D inputs; required for "correct".
+            norm: ``"batch"`` (BatchNorm3d) or ``"group"`` (GroupNorm, which
+                does not depend on the batch size).
+        """
         super().__init__()
+        if geometry not in ("legacy", "correct"):
+            raise ValueError(f"geometry must be 'legacy' or 'correct', got {geometry}")
+        if geometry == "correct" and not input_width:
+            raise ValueError("geometry='correct' needs input_width (the 2D image width)")
 
         self.in_channels = in_channels
         self.mid_channels = mid_channels
         self.out_channels = out_channels
         self.intermediate_depth = intermediate_depth
+        self.geometry = geometry
+        self.norm = norm
 
         # Shared-architecture encoders for two orthogonal views
         self.sagittal_encoder = XRayEncoder(in_channels, mid_channels)
@@ -237,8 +258,15 @@ class TransVert(nn.Module):
             channels=mid_channels,
             expand_dim='depth',     # AP  → expand along depth  (dim 2)
         )
+        if geometry == "correct":
+            # Width of the encoded AP slab: two stride-2 convs (k=3, p=1) = ceil twice.
+            self.feature_width = -(-(-(-input_width // 2)) // 2)
+            lateral_target = self.feature_width   # lateral copies fill the W axis
+        else:
+            self.feature_width = None
+            lateral_target = intermediate_depth   # legacy behaviour
         self.coronal_expander = VolumetricExpander(
-            target_depth=intermediate_depth,
+            target_depth=lateral_target,
             channels=mid_channels,
             expand_dim='width',     # Lat → expand along width  (dim 4)
         )
@@ -251,6 +279,11 @@ class TransVert(nn.Module):
             in_channels=mid_channels * 2,
             out_channels=out_channels,
         )
+
+        if norm == "group":
+            _batchnorm_to_groupnorm(self)
+        elif norm != "batch":
+            raise ValueError(f"norm must be 'batch' or 'group', got {norm}")
 
     def forward(self, sagittal_input, coronal_input):
         """
@@ -282,9 +315,21 @@ class TransVert(nn.Module):
         #   [B, C, 1, H', W']  →  permute  →  [B, C, H', W', 1]
         #                       →  expand   →  [B, C, H', W', D]
         #                       →  permute  →  [B, C, D, H', W']
-        c_enc = c_enc.permute(0, 1, 3, 4, 2).contiguous()  # [B, C, H', W', 1]
-        c_vol = self.coronal_expander(c_enc)                # [B, C, H', W', D]
-        c_vol = c_vol.permute(0, 1, 4, 2, 3).contiguous()  # [B, C, D, H', W']
+        if self.geometry == "correct":
+            # Lateral image columns run anterior-posterior, i.e. along D.
+            #   [B, C, 1, H', W'lat] -> resize columns to D -> [B, C, D, H', 1]
+            #   -> copy (learned expansion) along W, the lateral ray direction.
+            depth = s_vol.shape[2]
+            c = c_enc.squeeze(2)                                         # [B, C, H', W'lat]
+            c = F.interpolate(c, size=(c.shape[2], depth), mode="bilinear", align_corners=False)
+            c = c.permute(0, 1, 3, 2).unsqueeze(-1).contiguous()         # [B, C, D, H', 1]
+            c_vol = self.coronal_expander(c)                             # [B, C, D, H', W']
+        else:
+            # Legacy (wrong): the two permutes cancel, so the lateral columns
+            # land on W exactly like the AP view.
+            c_enc = c_enc.permute(0, 1, 3, 4, 2).contiguous()  # [B, C, H', W', 1]
+            c_vol = self.coronal_expander(c_enc)                # [B, C, H', W', D]
+            c_vol = c_vol.permute(0, 1, 4, 2, 3).contiguous()  # [B, C, D, H', W']
 
         # ── Fusion + Decode ──
         fused  = self.fusion(s_vol, c_vol)                  # [B, 2C, D, H', W']
@@ -308,12 +353,27 @@ class TransVert(nn.Module):
 
     def __repr__(self):
         return (
-            f"TransVert(in_channels={self.in_channels}, "
+            f"DualViewCNN(in_channels={self.in_channels}, "
             f"mid_channels={self.mid_channels}, "
             f"out_channels={self.out_channels}, "
-            f"intermediate_depth={self.intermediate_depth})"
+            f"intermediate_depth={self.intermediate_depth}, "
+            f"geometry={self.geometry!r}, norm={self.norm!r})"
         )
 
 
-# Convenience exports
-__all__ = ["TransVert"]
+def _batchnorm_to_groupnorm(module):
+    """Replace every BatchNorm3d inside *module* by GroupNorm (8 groups when possible)."""
+    for name, child in module.named_children():
+        if isinstance(child, nn.BatchNorm3d):
+            channels = child.num_features
+            groups = 8 if channels % 8 == 0 else 1
+            setattr(module, name, nn.GroupNorm(groups, channels))
+        else:
+            _batchnorm_to_groupnorm(child)
+
+
+# Compatibility alias for loading legacy checkpoints.  New training and paper
+# material must use ``DualViewCNN``; this implementation is not TransVert.
+TransVert = DualViewCNN
+
+__all__ = ["DualViewCNN", "TransVert"]

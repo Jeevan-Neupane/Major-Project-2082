@@ -15,8 +15,8 @@ Examples:
   # Train SwinX2S on Femur dataset
   python train.py --config swinx2s_femur
   
-  # Train TransVert on Hip dataset with custom epochs
-  python train.py --config transvert_hip --epochs 50
+  # Train DualViewCNN on Hip dataset with custom epochs
+  python train.py --config dualviewcnn_hip --epochs 50
   
   # Train with custom batch size and learning rate
   python train.py --config swinx2s_verse19 --batch_size 2 --lr 5e-4
@@ -31,7 +31,7 @@ Examples:
         "--config",
         type=str,
         required=False,
-        help="Configuration name (e.g., swinx2s_femur, transvert_hip)"
+        help="Configuration name (e.g., swinx2s_femur, dualviewcnn_hip)"
     )
     
     parser.add_argument(
@@ -67,6 +67,34 @@ Examples:
         type=str,
         default=None,
         help="Directory to save models (overrides config)"
+    )
+
+    parser.add_argument(
+        "--data_root",
+        type=str,
+        default=None,
+        help="Dataset root containing train/, val/, and optional test/ splits"
+    )
+
+    parser.add_argument(
+        "--split_manifest",
+        type=str,
+        default=None,
+        help="Split manifest JSON to use instead of splits/<dataset>_seed<seed>.json "
+             "(e.g. splits/ctpelvic_seed42_dedup.json, which has no duplicated samples)"
+    )
+
+    parser.add_argument(
+        "--num_workers",
+        type=int,
+        default=None,
+        help="DataLoader worker count (overrides config)"
+    )
+
+    parser.add_argument(
+        "--dry_run",
+        action="store_true",
+        help="Validate splits and load one sample from train/val, then exit"
     )
     
     parser.add_argument(
@@ -122,28 +150,28 @@ def apply_args_to_config(config_class, args):
                 'FEATURE_SIZE': 32,
                 'DEPTHS': (2, 2, 6, 2),
                 'NUM_HEADS': (1, 2, 4, 8),
-                'WINDOW_SIZE': (8, 8),
+                'WINDOW_SIZE': (7, 7),
             },
             'small': {
                 'IMG_SIZE': [128, 128, 160],
                 'FEATURE_SIZE': 64,
                 'DEPTHS': (2, 2, 6, 2),
                 'NUM_HEADS': (2, 4, 8, 16),
-                'WINDOW_SIZE': (8, 8),
+                'WINDOW_SIZE': (7, 7),
             },
             'base': {
                 'IMG_SIZE': [128, 128, 160],
                 'FEATURE_SIZE': 96,
                 'DEPTHS': (2, 2, 18, 2),
                 'NUM_HEADS': (3, 6, 12, 24),
-                'WINDOW_SIZE': (8, 8),
+                'WINDOW_SIZE': (7, 7),
             },
             'large': {
                 'IMG_SIZE': [128, 128, 160],
                 'FEATURE_SIZE': 128,
                 'DEPTHS': (2, 2, 18, 2),
                 'NUM_HEADS': (4, 8, 16, 32),
-                'WINDOW_SIZE': (8, 8),
+                'WINDOW_SIZE': (7, 7),
             },
         }
         
@@ -172,6 +200,18 @@ def apply_args_to_config(config_class, args):
     
     if args.save_dir is not None:
         config_class.SAVE_DIR = args.save_dir
+
+    if args.data_root is not None:
+        config_class.DATA_ROOT = args.data_root
+
+    if args.split_manifest is not None:
+        import os
+        config_class.SPLIT_MANIFEST = os.path.abspath(args.split_manifest)
+
+    if args.num_workers is not None:
+        if args.num_workers < 0:
+            raise ValueError("--num_workers must be non-negative")
+        config_class.NUM_WORKERS = args.num_workers
     
     if args.no_wandb:
         config_class.USE_WANDB = False

@@ -1,0 +1,84 @@
+{
+ "models": {
+  "dualviewcnn (legacy)": {
+   "ap": {
+    "corr_D": -0.783,
+    "corr_W": 1.0,
+    "shift_D": 0.007,
+    "shift_W": 0.193,
+    "ok": true
+   },
+   "lat": {
+    "corr_D": 0.838,
+    "corr_W": 1.0,
+    "shift_D": 0.001,
+    "shift_W": 0.191,
+    "ok": false
+   }
+  },
+  "dualviewcnn (correct)": {
+   "ap": {
+    "corr_D": -0.818,
+    "corr_W": 1.0,
+    "shift_D": 0.007,
+    "shift_W": 0.192,
+    "ok": true
+   },
+   "lat": {
+    "corr_D": 1.0,
+    "corr_W": 0.15,
+    "shift_D": 0.206,
+    "shift_W": 0.002,
+    "ok": true
+   }
+  },
+  "swinx2s (legacy)": {
+   "ap": {
+    "corr_D": -0.914,
+    "corr_W": 1.0,
+    "shift_D": 0.0,
+    "shift_W": 0.217,
+    "ok": true
+   },
+   "lat": {
+    "corr_D": -0.914,
+    "corr_W": 1.0,
+    "shift_D": 0.0,
+    "shift_W": 0.217,
+    "ok": false
+   }
+  },
+  "swinx2s (correct)": {
+   "ap": {
+    "corr_D": -0.914,
+    "corr_W": 1.0,
+    "shift_D": 0.0,
+    "shift_W": 0.217,
+    "ok": true
+   },
+   "lat": {
+    "corr_D": 1.0,
+    "corr_W": 0.271,
+    "shift_D": 0.202,
+    "shift_W": 0.004,
+    "ok": true
+   }
+  },
+  "multiscale_dualviewcnn": {
+   "ap": {
+    "corr_D": 0.193,
+    "corr_W": 0.997,
+    "shift_D": 0.008,
+    "shift_W": 0.096,
+    "ok": true
+   },
+   "lat": {
+    "corr_D": 0.994,
+    "corr_W": -0.004,
+    "shift_D": 0.117,
+    "shift_W": 0.002,
+    "ok": true
+   }
+  }
+ }
+}

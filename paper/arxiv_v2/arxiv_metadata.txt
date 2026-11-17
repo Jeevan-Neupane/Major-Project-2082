@@ -1,0 +1,17 @@
+TITLE
+Reconstructing 3D Bone Shapes from Biplanar X-rays: Three Deep Learning Models Tested on Six Datasets
+
+AUTHORS
+(to be added later; the author list is pending)
+
+PRIMARY CATEGORY
+eess.IV
+
+CROSS-LIST
+cs.CV
+
+COMMENTS
+24 pages, 9 figures, 9 tables. Version 2: all 18 models retrained after correcting how the two X-ray views were placed in 3D and matching the training settings; new results throughout. Trained models: https://huggingface.co/jeevan1234/biplanar-bone-reconstruction-models ; per-case results, logs and analysis scripts are in the ancillary files.
+
+ABSTRACT (1845 characters; arXiv limit 1,920)
+A 3D model of a bone made from one front and one side X-ray image could help where CT is not available. The problem is hard because many different 3D shapes give the same two images, and published results are difficult to compare because studies use different bones and data. We trained three deep learning models under one protocol on six datasets built from TotalSegmentator, VerSe and CTPelvic1K: proximal femur, rib cage, two vertebra datasets and two pelvis datasets. The inputs are simulated X-ray images (digitally reconstructed radiographs) and the outputs are 3D bone masks. The models are a small two-view convolutional network (DualViewCNN), a multi-scale two-view network (MultiScale, 3.7M parameters) and Swin-X2S (Tiny version, 32.5M parameters, adapted from its official code). All three place the features of both views in 3D according to the X-ray geometry, which we checked with a projection test, and all were trained with the same epoch limit, batch size and early stopping. On 297 test cases, MultiScale had the highest mean Dice on all six datasets (femur 94.9%, vertebrae 88.3% and 89.2%, pelvis 87.0% and 86.6%, rib cage 56.4%), and SwinX2S was second on five. MultiScale's mean 95th-percentile Hausdorff distance was 2.4-5.2 mm on all datasets except the rib cage (9.0 mm). It scored higher than DualViewCNN on 296 of 297 cases and higher than SwinX2S on 282. After Holm correction, 11 of the 12 paired comparisons were significant; the exception was SwinX2S on VerSe20 (n = 10). An earlier version of these models placed the views incorrectly. Correcting this and matching the training settings raised the mean Dice over the six datasets by 4.8 to 18.8 points on the same test cases. All inputs are simulated, and we did not measure clinical values. We release the trained models, per-case results and analysis scripts.

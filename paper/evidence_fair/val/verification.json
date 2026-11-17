@@ -1,0 +1,133 @@
+{
+ "all_passed": true,
+ "tolerance": 0.0005,
+ "started": "2026-11-17 06:49:07 UTC",
+ "runs": [
+  {
+   "config": "fair_dualviewcnn_femur",
+   "rescored": 0.9130836976251591,
+   "logged": 0.9130836958820755,
+   "abs_diff": 1.743083566374537e-09,
+   "passed": true
+  },
+  {
+   "config": "fair_multiscale_femur",
+   "rescored": 0.9381237827442788,
+   "logged": 0.9381237835497469,
+   "abs_diff": 8.054681366331806e-10,
+   "passed": true
+  },
+  {
+   "config": "fair_swinx2s_femur",
+   "rescored": 0.9235590983660439,
+   "logged": 0.9235627578722464,
+   "abs_diff": 3.6595062025135405e-06,
+   "passed": true
+  },
+  {
+   "config": "fair_dualviewcnn_hip",
+   "rescored": 0.7972728312015533,
+   "logged": 0.7972710596190559,
+   "abs_diff": 1.771582497478441e-06,
+   "passed": true
+  },
+  {
+   "config": "fair_multiscale_hip",
+   "rescored": 0.8570177025265164,
+   "logged": 0.8570170203844706,
+   "abs_diff": 6.821420458491545e-07,
+   "passed": true
+  },
+  {
+   "config": "fair_swinx2s_hip",
+   "rescored": 0.8298593511184057,
+   "logged": 0.8298602369096544,
+   "abs_diff": 8.857912486837094e-07,
+   "passed": true
+  },
+  {
+   "config": "fair_dualviewcnn_rib",
+   "rescored": 0.45840398575130265,
+   "logged": 0.45840398575130265,
+   "abs_diff": 0.0,
+   "passed": true
+  },
+  {
+   "config": "fair_multiscale_rib",
+   "rescored": 0.5246021784842014,
+   "logged": 0.5245907243929411,
+   "abs_diff": 1.145409126035446e-05,
+   "passed": true
+  },
+  {
+   "config": "fair_swinx2s_rib",
+   "rescored": 0.4297110238847764,
+   "logged": 0.42970607782665055,
+   "abs_diff": 4.946058125843145e-06,
+   "passed": true
+  },
+  {
+   "config": "fair_dualviewcnn_verse19",
+   "rescored": 0.6716968992384531,
+   "logged": 0.6716969013214111,
+   "abs_diff": 2.082958028282178e-09,
+   "passed": true
+  },
+  {
+   "config": "fair_multiscale_verse19",
+   "rescored": 0.8747473929518013,
+   "logged": 0.8747473288607853,
+   "abs_diff": 6.40910159388497e-08,
+   "passed": true
+  },
+  {
+   "config": "fair_swinx2s_verse19",
+   "rescored": 0.8509120184888121,
+   "logged": 0.8509134598957595,
+   "abs_diff": 1.4414069473556168e-06,
+   "passed": true
+  },
+  {
+   "config": "fair_dualviewcnn_verse20",
+   "rescored": 0.7066821672699668,
+   "logged": 0.7066821672699668,
+   "abs_diff": 0.0,
+   "passed": true
+  },
+  {
+   "config": "fair_multiscale_verse20",
+   "rescored": 0.8714749867265875,
+   "logged": 0.8714749921451915,
+   "abs_diff": 5.418604009932437e-09,
+   "passed": true
+  },
+  {
+   "config": "fair_swinx2s_verse20",
+   "rescored": 0.8593739000233737,
+   "logged": 0.8593712611631914,
+   "abs_diff": 2.638860182258007e-06,
+   "passed": true
+  },
+  {
+   "config": "fair_dualviewcnn_ctpelvic",
+   "rescored": 0.7897711545228958,
+   "logged": 0.7897708440820376,
+   "abs_diff": 3.1044085824216694e-07,
+   "passed": true
+  },
+  {
+   "config": "fair_multiscale_ctpelvic",
+   "rescored": 0.8684565052390099,
+   "logged": 0.8684588894248009,
+   "abs_diff": 2.384185791015625e-06,
+   "passed": true
+  },
+  {
+   "config": "fair_swinx2s_ctpelvic",
+   "rescored": 0.8217761206130186,
+   "logged": 0.8217813496788343,
+   "abs_diff": 5.2290658156817216e-06,
+   "passed": true
+  }
+ ]
+}

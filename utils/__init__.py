@@ -1,12 +1,4 @@
-"""
-Utilities for training and evaluation.
-
-Sub-packages:
-
-  - utils.data      — dataset loading
-  - utils.training  — training loop, losses, metrics, checkpoints, logging
-  - utils.clinical  — anatomy-specific clinical metric computation
-"""
+"""Utility modules for data loading, evaluation, and model training."""
 
 # Re-export core functions/classes for easy imports
 from utils.data.dataset import BoneDataset, collate_bone

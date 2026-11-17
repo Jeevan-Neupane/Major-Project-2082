@@ -80,6 +80,20 @@ class WindowAttention(nn.Module):
         x = self.proj_drop(x)
         return x
 
+def window_partition(x, window_size):
+    """[B, H, W, C] -> [B * num_windows, wh, ww, C]; each window keeps whole pixels (standard Swin)."""
+    B, H, W, C = x.shape
+    x = x.view(B, H // window_size[0], window_size[0], W // window_size[1], window_size[1], C)
+    return x.permute(0, 1, 3, 2, 4, 5).contiguous().view(-1, window_size[0], window_size[1], C)
+
+
+def window_reverse(windows, window_size, H, W):
+    """Inverse of window_partition: [B * num_windows, wh, ww, C] -> [B, H, W, C]."""
+    B = int(windows.shape[0] / (H * W / window_size[0] / window_size[1]))
+    x = windows.view(B, H // window_size[0], W // window_size[1], window_size[0], window_size[1], -1)
+    return x.permute(0, 1, 3, 2, 4, 5).contiguous().view(B, H, W, -1)
+
+
 class SwinTransformerBlock(nn.Module):
     def __init__(self, dim, input_resolution, num_heads, window_size, shift_size,
                  mlp_ratio=4., qkv_bias=True, qk_scale=None, drop=0., attn_drop=0., drop_path=0.,
@@ -141,6 +155,10 @@ class SwinTransformerBlock(nn.Module):
 
         self.register_buffer("attn_mask", attn_mask)
         self.fused_window_process = fused_window_process
+        # False = the November 2026 behaviour (windows built with unfold + view, which mixes pixels
+        # and channels and is not inverted; drop path never applied). True = standard Swin windows
+        # and drop path on both residual branches, as in the official Swin-X2S code.
+        self.official_windows = False
 
     def forward(self, x):
         H, W = self.input_resolution
@@ -160,16 +178,23 @@ class SwinTransformerBlock(nn.Module):
         else:
             shifted_x = x
 
-        x_windows = shifted_x.unfold(1, self.window_size[0], self.window_size[0]) \
-                             .unfold(2, self.window_size[1], self.window_size[1]) \
-                             .contiguous().view(-1, self.window_size[0]*self.window_size[1], C)
+        if self.official_windows:
+            x_windows = window_partition(shifted_x, self.window_size)
+            x_windows = x_windows.view(-1, self.window_size[0] * self.window_size[1], C)
+            attn_windows = self.attn(x_windows, mask=self.attn_mask) \
+                               .view(-1, self.window_size[0], self.window_size[1], C)
+            x = window_reverse(attn_windows, self.window_size, Hp, Wp)
+        else:
+            x_windows = shifted_x.unfold(1, self.window_size[0], self.window_size[0]) \
+                                 .unfold(2, self.window_size[1], self.window_size[1]) \
+                                 .contiguous().view(-1, self.window_size[0]*self.window_size[1], C)
 
-        attn_windows = self.attn(x_windows, mask=self.attn_mask) \
-                         .view(-1, self.window_size[0], self.window_size[1], C)
+            attn_windows = self.attn(x_windows, mask=self.attn_mask) \
+                             .view(-1, self.window_size[0], self.window_size[1], C)
 
-        B_ = B * (Hp // self.window_size[0]) * (Wp // self.window_size[1])
-        x = attn_windows.view(B_, self.window_size[0], self.window_size[1], C) \
-                         .contiguous().view(B, Hp, Wp, C)
+            B_ = B * (Hp // self.window_size[0]) * (Wp // self.window_size[1])
+            x = attn_windows.view(B_, self.window_size[0], self.window_size[1], C) \
+                             .contiguous().view(B, Hp, Wp, C)
 
         if self.shift_size[0] > 0 or self.shift_size[1] > 0:
             x = torch.roll(x, shifts=(self.shift_size[0], self.shift_size[1]), dims=(1, 2))
@@ -178,8 +203,12 @@ class SwinTransformerBlock(nn.Module):
             x = x[:, :H, :W, :].contiguous()
 
         x = x.view(B, H * W, C)
-        x = shortcut + x
-        x = x + self.mlp(self.norm2(x))
+        if self.official_windows:
+            x = shortcut + self.drop_path(x)
+            x = x + self.drop_path(self.mlp(self.norm2(x)))
+        else:
+            x = shortcut + x
+            x = x + self.mlp(self.norm2(x))
         return x
 
 class PatchMerging(nn.Module):

@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from typing import MutableMapping, Sequence, Tuple, Union
 
 from .swinX2S.unetr_blocks import UnetrBasicBlock, UnetrUpBlock, UnetOutBlock
@@ -21,11 +22,43 @@ class SwinX2S(nn.Module):
                  attn_drop_rate: float = 0.0,
                  spatial_dims: int = 3,
                  fusion_depths: Sequence[int] = (2, 2, 2, 2, 2, 2),
-                 window_size: Sequence[int] = (8, 8)) -> None:
+                 window_size: Sequence[int] = (8, 8),
+                 geometry: str = "legacy",
+                 output_mode: str = "fuse",
+                 swin_impl: str = "legacy") -> None:
+        """Adapted from the official Swin-X2S code (MIT licence, (c) 2025 liukuan5625).
+
+        Extra options (defaults reproduce the November 2026 models exactly):
+            geometry: "legacy" inflates the lateral view exactly like the AP view
+                (image columns on W, copies along D), which is geometrically wrong for
+                our data. "correct" puts the lateral image columns (anterior-posterior)
+                on D and copies along W. Volume axes are (D, H, W) = (anterior-posterior,
+                superior-inferior, left-right). The official code permutes the second view
+                too, but for a different image layout, so it is not reused as is.
+            swin_impl: "legacy" keeps the November 2026 window code of models/swinX2S/swin_transformer.py
+                (windows built with unfold + view, which mixes pixels and channels, and no drop path).
+                "official" uses standard Swin window partition/reverse and applies drop path (rate up
+                to 0.2 over depth), as in the official Swin-X2S code.
+            output_mode: "fuse" (our 1x1x1 conv over both view outputs) or "average"
+                (official behaviour: the prediction is the mean of the two view logits;
+                the per-view logits are kept in ``self.view_logits`` for the official
+                two-view loss, see utils/training/losses.py::two_view_loss).
+        """
         super().__init__()
+        if geometry not in ("legacy", "correct"):
+            raise ValueError(f"geometry must be 'legacy' or 'correct', got {geometry}")
+        if swin_impl not in ("legacy", "official"):
+            raise ValueError(f"swin_impl must be 'legacy' or 'official', got {swin_impl}")
+        self.swin_impl = swin_impl
+        if output_mode not in ("fuse", "average"):
+            raise ValueError(f"output_mode must be 'fuse' or 'average', got {output_mode}")
+        self.geometry = geometry
+        self.output_mode = output_mode
         assert isinstance(img_size, (list, tuple)) and len(img_size) == 3, "img_size must be [D,H,W]"
         D, H, W = img_size
         assert D % 32 == 0, "Depth D should be divisible by 32."
+        if geometry == "correct":
+            assert W % 32 == 0, "Width W should be divisible by 32 for geometry='correct'."
         self.img_size = img_size
 
         # 3D encoders
@@ -55,6 +88,12 @@ class SwinX2S(nn.Module):
                                        img_size=img_size[1:], window_size=window_size,
                                        patch_size=2, num_heads=num_heads)
 
+        if swin_impl == "official":
+            from .swinX2S.swin_transformer import SwinTransformerBlock
+            for block in self.swinViT.modules():
+                if isinstance(block, SwinTransformerBlock):
+                    block.official_windows = True
+
         # 2D -> 3D inflation
         self.expand_ = nn.ModuleList([nn.Conv3d(1, int(img_size[0] / (2 ** i)), 1)
                                       for i in range(len(depths) + 2)])
@@ -62,16 +101,38 @@ class SwinX2S(nn.Module):
             nn.init.constant_(e.weight, 1.0)
             nn.init.constant_(e.bias, 0.0)
 
-        # fusion head
-        self.fuse = nn.Conv3d(out_channels * 2, out_channels, kernel_size=1, bias=True)
+        if geometry == "correct":
+            # lateral view: copies along W (one 1x1x1 conv per scale, initialised as a plain copy)
+            self.expand_lat_ = nn.ModuleList([nn.Conv3d(1, int(W / (2 ** i)), 1)
+                                              for i in range(len(depths) + 2)])
+            for e in self.expand_lat_:
+                nn.init.constant_(e.weight, 1.0)
+                nn.init.constant_(e.bias, 0.0)
+
+        # fusion head (our addition; the official model averages the two view outputs)
+        if output_mode == "fuse":
+            self.fuse = nn.Conv3d(out_channels * 2, out_channels, kernel_size=1, bias=True)
 
     def _inflate_list_to_3d(self, feats_2d_list, *, pos: bool):
+        """Turn 2D features [B, H_i, W_i, C] into volumes [B, C, D_i, H_i, W_i].
+
+        pos=True is the AP view, pos=False the lateral view. In "legacy" mode both views are
+        treated the same way (the flag is ignored, as in the November 2026 models).
+        """
         out = []
         for i, x in enumerate(feats_2d_list):
-            x = x.permute(0, 3, 1, 2)
-            x = x.unsqueeze(1)
-            x = self.expand_[i](x)
-            x = x.permute(0, 2, 1, 3, 4)
+            x = x.permute(0, 3, 1, 2)                       # [B, C, rows, cols]
+            if self.geometry == "correct" and not pos:
+                depth_i = self.expand_[i].out_channels
+                # lateral columns run anterior-posterior: resize them to D_i
+                x = F.interpolate(x, size=(x.shape[2], depth_i), mode="bilinear", align_corners=False)
+                x = x.permute(0, 1, 3, 2).unsqueeze(1)      # [B, 1, C, D_i, H_i]
+                x = self.expand_lat_[i](x)                  # [B, W_i, C, D_i, H_i]  (copies along W)
+                x = x.permute(0, 2, 3, 4, 1)                # [B, C, D_i, H_i, W_i]
+            else:
+                x = x.unsqueeze(1)                          # [B, 1, C, H_i, W_i]
+                x = self.expand_[i](x)                      # [B, D_i, C, H_i, W_i]  (copies along D)
+                x = x.permute(0, 2, 1, 3, 4)                # [B, C, D_i, H_i, W_i]
             out.append(x)
         return out
 
@@ -102,5 +163,8 @@ class SwinX2S(nn.Module):
         xa_e["dec4"], xb_e["dec4"] = self.cross_atte6(xa_e["dec4"], xb_e["dec4"])
         ya = self.forward_view_decoder(xa_e)
         yb = self.forward_view_decoder(xb_e)
+        if self.output_mode == "average":
+            self.view_logits = (ya, yb)
+            return (ya + yb) / 2
         y = torch.cat([ya, yb], dim=1)
         return self.fuse(y)

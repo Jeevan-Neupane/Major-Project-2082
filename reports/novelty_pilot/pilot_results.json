@@ -1,0 +1,62 @@
+{
+ "femur": {
+  "n_train": 595,
+  "n_val": 74,
+  "threshold": 0.4,
+  "mean_shape_dice": 0.6558962809655047,
+  "retrieval_dice": 0.8376951111017423,
+  "multiscale_best_val_dice": 0.9252786998813217,
+  "dualviewcnn_best_val_dice": 0.7865693891370619,
+  "swinx2s_best_val_dice": 0.9025264636320817
+ },
+ "hip": {
+  "n_train": 285,
+  "n_val": 36,
+  "threshold": 0.3,
+  "mean_shape_dice": 0.6597502523894726,
+  "retrieval_dice": 0.6358395794193026,
+  "multiscale_best_val_dice": 0.8021610279877981,
+  "dualviewcnn_best_val_dice": 0.5821863032049603,
+  "swinx2s_best_val_dice": 0.7052124722136391
+ },
+ "rib": {
+  "n_train": 307,
+  "n_val": 38,
+  "threshold": 0.2,
+  "mean_shape_dice": 0.000803271975826904,
+  "retrieval_dice": 0.1159934766078958,
+  "multiscale_best_val_dice": 0.3945979578826442,
+  "dualviewcnn_best_val_dice": 0.1935762472842869,
+  "swinx2s_best_val_dice": 0.15679126605391502
+ },
+ "verse19": {
+  "n_train": 747,
+  "n_val": 93,
+  "threshold": 0.3,
+  "mean_shape_dice": 0.601784422595858,
+  "retrieval_dice": 0.7398302774935055,
+  "multiscale_best_val_dice": 0.8595378296349638,
+  "dualviewcnn_best_val_dice": 0.47172085604360026,
+  "swinx2s_best_val_dice": 0.8219102073100305
+ },
+ "verse20": {
+  "n_train": 85,
+  "n_val": 11,
+  "threshold": 0.4,
+  "mean_shape_dice": 0.6965622712511375,
+  "retrieval_dice": 0.7791059199131664,
+  "multiscale_best_val_dice": 0.849748822775754,
+  "dualviewcnn_best_val_dice": 0.46831887418573553,
+  "swinx2s_best_val_dice": 0.8182552294297651
+ },
+ "ctpelvic": {
+  "n_train": 412,
+  "n_val": 48,
+  "threshold": 0.3,
+  "mean_shape_dice": 0.5902118975669004,
+  "retrieval_dice": 0.5994970350372367,
+  "multiscale_best_val_dice": 0.8274559566268215,
+  "dualviewcnn_best_val_dice": 0.5893391365254367,
+  "swinx2s_best_val_dice": 0.6824184556802114
+ }
+}
