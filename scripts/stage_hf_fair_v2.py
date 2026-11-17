@@ -10,7 +10,10 @@ Writes a folder that mirrors what will be added to `jeevan1234/biplanar-bone-rec
   checkpoint_inventory.json                          (list of the uploaded files)
 The upload (scripts/upload_hf_fair_v2.py) removes the files of the earlier models from the repo. No data are included.
 
-Usage: python scripts/stage_hf_fair_v2.py --stage /tmp/hf_stage
+The code, splits, licence notice and statistics are taken from the clean code repository
+(github.com/Jeevan-Neupane/biplanar-bone-reconstruction, --code-root); the weights come from the run folders.
+
+Usage: python scripts/stage_hf_fair_v2.py --stage /tmp/hf_stage --code-root ../biplanar-bone-reconstruction
 """
 import argparse
 import json
@@ -29,7 +32,7 @@ CODE = ["train.py", "requirements.txt", "configs/__init__.py", "configs/config.p
         "utils/training/__init__.py", "utils/training/checkpoint.py", "utils/training/logger.py",
         "utils/training/losses.py", "utils/training/metrics.py", "utils/training/trainer.py",
         "scripts/evaluate_fair.py", "scripts/evaluate_checkpoints.py", "scripts/check_geometry.py",
-        "scripts/__init__.py"]
+        "scripts/__init__.py", "THIRD_PARTY_NOTICES.md"]
 LABEL = {"femur": "Femur", "hip": "Hip", "rib": "Rib", "verse19": "VerSe19", "verse20": "VerSe20", "ctpelvic": "CTPelvic"}
 
 
@@ -91,7 +94,7 @@ Limitations:
 - Trained and tested only on simulated X-ray images (DRRs) from public CT datasets.
 - Not clinically validated.
 - Splits are by sample, so vertebrae or femurs from the same scan can fall into different splits.
-- Each model was trained once (one seed). The test splits had been scored once before, for an earlier version of these models.
+- Each model was trained once (one seed), and the learning rates were not tuned.
 
 Licences:
 - Training data: TotalSegmentator (CC BY 4.0), VerSe (CC BY-SA 4.0) and CTPelvic1K (CC BY-NC-SA). Models trained on CTPelvic1K
@@ -105,11 +108,13 @@ Licences:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stage", required=True)
+    ap.add_argument("--code-root", required=True, help="clean code repository (biplanar-bone-reconstruction)")
     args = ap.parse_args()
     st = args.stage
     shutil.rmtree(st, ignore_errors=True)
     os.makedirs(st)
-    ev = os.path.join(ROOT, "paper", "evidence_fair")
+    code_root = os.path.abspath(args.code_root)
+    ev = os.path.join(code_root, "results")
     results = json.load(open(os.path.join(ev, "results_fair.json")))
     new_files = []
     for (model, ds), run_dir in RUNS.items():
@@ -119,14 +124,14 @@ def main():
         t = json.load(open(os.path.join(ev, "test", f"fair_{model}_{ds}.json")))
         v = json.load(open(os.path.join(ev, "val", f"fair_{model}_{ds}.json")))
         info = {k: t[k] for k in ["config", "model", "dataset", "best_epoch", "logged_val_dice", "params", "grid",
-                                  "flip_ap_lr", "view_geometry", "swin_impl", "split_manifest"]}
+                                  "flip_ap_lr", "split_manifest"]}
         info.update(run=os.path.basename(run_dir), val_summary=v["summary"], test_summary=t["summary"],
                     test_scored_at=t["evaluated_at"],
                     trained_on="NVIDIA L40S (Modal)" if run_dir.startswith("modal_results") else "NVIDIA RTX 5090")
         json.dump(info, open(os.path.join(dst, "run_info.json"), "w"), indent=1)
         new_files += [f"fair_v2/{model}/{ds}/best_model_weights.pth", f"fair_v2/{model}/{ds}/run_info.json"]
     for rel in CODE:
-        src = os.path.join(ROOT, rel)
+        src = os.path.join(code_root, rel)
         if rel == "scripts/__init__.py" and not os.path.exists(src):
             os.makedirs(os.path.join(st, "fair_v2", "code", "scripts"), exist_ok=True)
             open(os.path.join(st, "fair_v2", "code", rel), "w").close()
@@ -134,13 +139,8 @@ def main():
             os.makedirs(os.path.dirname(os.path.join(st, "fair_v2", "code", rel)), exist_ok=True)
             shutil.copy2(src, os.path.join(st, "fair_v2", "code", rel))
         new_files.append(f"fair_v2/code/{rel}")
-    shutil.copytree(os.path.join(ROOT, "splits"), os.path.join(st, "fair_v2", "code", "splits"))
-    new_files += [f"fair_v2/code/splits/{f}" for f in sorted(os.listdir(os.path.join(ROOT, "splits")))]
-    mit = open(os.path.join(ROOT, "paper", "arxiv_v2", "anc_README.md")).read()
-    mit = mit[mit.index("## Licence of the adapted Swin-X2S code"):]
-    open(os.path.join(st, "fair_v2", "code", "THIRD_PARTY_NOTICES.md"), "w").write(
-        "# Third-party notices\n\n`models/swinx2s.py` and `models/swinX2S/` are adapted from Swin-X2S.\n\n" + mit)
-    new_files.append("fair_v2/code/THIRD_PARTY_NOTICES.md")
+    shutil.copytree(os.path.join(code_root, "splits"), os.path.join(st, "fair_v2", "code", "splits"))
+    new_files += [f"fair_v2/code/splits/{f}" for f in sorted(os.listdir(os.path.join(code_root, "splits")))]
     shutil.copy2(os.path.join(ev, "results_fair.json"), os.path.join(st, "fair_v2", "results_fair.json"))
     new_files.append("fair_v2/results_fair.json")
     open(os.path.join(st, "README.md"), "w").write(model_card(results))

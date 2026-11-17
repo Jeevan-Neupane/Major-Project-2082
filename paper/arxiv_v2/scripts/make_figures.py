@@ -1,8 +1,8 @@
-"""Schematic figures of the revised manuscript (no experimental data is drawn here).
+"""Schematic figures of the paper (no experimental data is drawn here).
 
 overview.pdf               study pipeline, from CT collections to evaluation
 lifting.pdf                how each model places the AP and lateral features in the 3D grid
-swinx2s_implementation.pdf our SwinX2S implementation (replaces the reproduced published figure)
+swinx2s_implementation.pdf our SwinX2S implementation
 cnn_dualview_architecture.pdf, cnn_multiscale_architecture.pdf
                            the CNN schematics of paper/generate_cnn_architectures.py, redrawn
                            without an in-figure title

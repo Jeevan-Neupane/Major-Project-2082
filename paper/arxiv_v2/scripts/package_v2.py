@@ -1,9 +1,10 @@
-"""Assemble the arXiv source package of version 2 (fair benchmark, 17 Nov 2026).
+"""Assemble the arXiv source package.
 
 arxiv_v2.zip contains main.tex, main.bbl, references.bib, the tables and figures that main.tex uses, and anc/
 (ancillary evidence; see anc_README.md). Build the paper first:
   latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=build main.tex
-Version 1 (paper/arxiv_submission/) is only read, never changed.
+The code, results, splits and checks in anc/ are taken from the clean code repository
+(github.com/Jeevan-Neupane/biplanar-bone-reconstruction, checked out next to this repository).
 """
 from pathlib import Path
 import re
@@ -13,7 +14,8 @@ import zipfile
 A = Path(__file__).resolve().parent.parent          # paper/arxiv_v2
 P = A.parent                                         # paper/
 R = P.parent                                         # repository root
-EV = P / "evidence_fair"
+C = R.parent / "biplanar-bone-reconstruction"         # clean code repository
+EV = C / "results"
 
 shutil.copy2(A / "build" / "main.bbl", A / "main.bbl")
 shutil.copy2(A / "build" / "main.pdf", A / "final_paper_v2.pdf")
@@ -26,15 +28,14 @@ for f in source:
     assert f.exists(), f
 
 anc = {"anc/README.md": A / "anc_README.md",
-       "anc/results_fair.json": EV / "results_fair.json",
-       "anc/earlier_version/results_revised.json": P / "arxiv_submission" / "results_revised.json"}
+       "anc/results_fair.json": EV / "results_fair.json"}
 for split in ["val", "test"]:
     for f in sorted((EV / split).glob("*.json")):
         anc[f"anc/{split}/{f.name}"] = f
-for f in sorted((R / "splits").glob("*.json")):
+for f in sorted((C / "splits").glob("*.json")):
     anc[f"anc/splits/{f.name}"] = f
-for f in ["data_flip_ap.json", "models_femur_final.json", "models_hip.json"]:
-    anc[f"anc/geometry_check/{f}"] = R / "reports" / "geometry_check" / f
+for f in ["data_flip_ap.json", "models_femur.json", "models_hip.json"]:
+    anc[f"anc/geometry_check/{f}"] = EV / "geometry_check" / f
 # training logs of the 18 runs (the run folders are listed in the evidence JSONs)
 import json
 for f in sorted((EV / "test").glob("fair_*.json")):
@@ -46,7 +47,7 @@ for f in sorted((EV / "test").glob("fair_*.json")):
         anc[f"anc/logs/{run}{ext}"] = src[0]
 for name in ["evaluate_fair.py", "analyze_fair.py", "evaluate_checkpoints.py", "check_geometry.py",
              "make_clean_splits.py", "modal_fair.py", "run_fair_queue.sh"]:
-    anc[f"anc/scripts/{name}"] = R / "scripts" / name
+    anc[f"anc/scripts/{name}"] = C / "scripts" / name
 for name in ["make_fair_tables.py", "make_figures.py"]:
     anc[f"anc/scripts/{name}"] = A / "scripts" / name
 for rel in ["train.py", "configs/config.py", "configs/args_parser.py", "utils/data/dataset.py",
@@ -54,7 +55,7 @@ for rel in ["train.py", "configs/config.py", "configs/args_parser.py", "utils/da
             "utils/training/checkpoint.py", "utils/training/logger.py", "models/transvert.py",
             "models/multiscale_dualview_cnn.py", "models/swinx2s.py", "models/swinX2S/swin_transformer.py",
             "models/swinX2S/transfusion.py", "models/swinX2S/unetr_blocks.py"]:
-    anc[f"anc/code/{rel}"] = R / rel
+    anc[f"anc/code/{rel}"] = C / rel
 
 allowed = re.compile(r"^[A-Za-z0-9_+\-.,=/]+$")
 for name in list(anc) + [str(f.relative_to(A)) for f in source]:

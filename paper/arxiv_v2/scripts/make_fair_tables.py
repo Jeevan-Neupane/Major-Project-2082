@@ -1,10 +1,7 @@
-"""Build the data-driven tables and figures of version 2 of the paper from the fair-benchmark results.
+"""Build the data-driven tables and figures of the paper from the benchmark results.
 
-Version 2 replaces the 18 runs of version 1 with the 18 "fair" runs (same budget for every model,
-corrected view geometry, AP image mirrored to the volume's W axis, deduplicated CTPelvic split).
-This script writes the same files, with the same LaTeX table structure and figure style, as
-make_revision_tables.py (box plot, qualitative figure, tables) and paper/generate_results.py
-(validation and loss curves) did for version 1, so main.tex needs no change to include them.
+Writes the box plot, the qualitative figure, the validation and loss curves and the LaTeX tables that
+main.tex includes.
 
 Nothing is trained, evaluated or re-scored here. Inputs:
   paper/evidence_fair/test/fair_<model>_<dataset>.json   per-case test metrics (scored once, 17 Nov 2026)
@@ -17,10 +14,9 @@ Nothing is trained, evaluated or re-scored here. Inputs:
 Only the run whose run_dir is named in the evidence JSON is read for each model and dataset, so
 timing tests and aborted runs in the same log folders are never used.
 
-Differences from version 1 that come from the data, not from the method:
-  * CTPelvic uses the deduplicated split (412/48/44), so there is no duplicate exclusion and no
-    tables/ctpelvic_duplicates.tex (the stale copy is deleted).
-  * The epoch limit is read from each log (200 for every model; it was 250 for SwinX2S in v1).
+Notes:
+  * CTPelvic uses the split with one copy of each scan (412/48/44).
+  * The epoch limit is read from each log (200 for every model).
   * SwinX2S hip and CTPelvic stopped at epochs 195 and 190 because of the cloud GPU time limit
     (learning rate already ~0); stability.tex shows the epochs actually run.
   * The qualitative figure shows the AP input mirrored, as the models saw it (see render()).
@@ -63,10 +59,10 @@ LABELS = ["Femur", "Hip", "Rib", "VerSe19", "VerSe20", "CTPelvic"]
 # Runs that ended on the cloud GPU's hard time limit, not on the epoch limit or early stopping.
 # Checked against the logs below; if another run ends without either, the script stops.
 TIME_LIMITED = {("hip", "swinx2s"), ("ctpelvic", "swinx2s")}
-# The three runs of the loss figure (the same panels as in version 1).
+# The three runs of the loss figure.
 LOSS_PANELS = [("rib", "multiscale", "MultiScale, rib"), ("hip", "swinx2s", "SwinX2S, hip"),
                ("ctpelvic", "swinx2s", "SwinX2S, CTPelvic")]
-# Validated categorical slots 1-3 (dataviz reference palette, light mode, all-pairs), as in v1.
+# Validated categorical slots 1-3 (dataviz reference palette, light mode, all-pairs).
 COLORS = ["#2a78d6", "#eb6834", "#1baf7a"]
 INK, INK2, GRID = "#0b0b0b", "#52514e", "#d9d8d4"
 
@@ -206,7 +202,7 @@ table("test_metrics.tex",
       r"Dataset & Model & Dice & IoU & Prec. & Rec. & NSD & Mean & Median & ASSD (mm)", body, "llrrrrrrrr")
 
 # ------------------------------------------------------------------ paired comparisons (from results_fair.json)
-# The statistics are taken as stored (scripts/analyze_fair.py, same method as version 1: 10,000
+# The statistics are taken as stored (scripts/analyze_fair.py: 10,000
 # bootstrap resamples with default_rng(0), two-sided Wilcoxon signed-rank test, Holm over the 12
 # MultiScale comparisons). Only their deterministic parts are checked against the per-case Dice here.
 comparisons = FAIR["paired_primary"]
@@ -328,11 +324,10 @@ plt.close(fig)
 
 # ------------------------------------------------------------------ qualitative figure
 def render(vol):
-    """Depth-shaded surface of a binary (D,H,W) volume viewed along D (as in version 1).
+    """Depth-shaded surface of a binary (D,H,W) volume viewed along D.
 
-    Image rows are H and columns are the volume's W axis, NOT flipped. Version 1 flipped the
-    rendering left-right to match the unmirrored AP radiograph; version 2 instead shows the AP
-    image mirrored (see below), whose columns already run along W, so neither is flipped here.
+    Image rows are H and columns are the volume's W axis, not flipped. The AP image is shown
+    mirrored, as the models saw it (see below), so its columns also run along W.
     """
     hit = vol.any(axis=0)
     depth = np.where(hit, vol.argmax(axis=0), vol.shape[0]).astype(float)
@@ -357,8 +352,8 @@ def data_root(ds):
 
 QUAL = {}
 for ds in DATASETS:
-    # Same rule as version 1 (evidence/code/scripts/select_qualitative.py): the case whose MultiScale
-    # test Dice is closest to the median MultiScale test Dice; ties go to the lower PID.
+    # The case whose MultiScale test Dice is closest to the median MultiScale test Dice; ties go to
+    # the lower PID.
     cs = cases(ds, "multiscale")
     med = np.median([c["dice"] for c in cs])
     pid = min(cs, key=lambda c: (abs(c["dice"] - med), c["pid"]))["pid"]
